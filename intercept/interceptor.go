@@ -15,6 +15,7 @@ var (
 	snapshot_len int32         = 1024
 	promiscuous  bool          = false
 	timeout      time.Duration = 900 * time.Millisecond
+	p            InterceptedPacket
 )
 
 type InterceptedPacket struct {
@@ -124,12 +125,22 @@ func (i *PacketInterceptor) interceptPacket() {
 		// fmt.Println("TCP dstPort:       ", tcp.DstPort)
 		// fmt.Println("HTTP/2:            ", h2c.frame)
 		// fmt.Println("*****************************************************")
-		p := InterceptedPacket{
-			IsIPv4: ipv4Ok,
-			IPv4:   *ipv4,
-			IPv6:   *ipv6,
-			TCP:    *tcp,
-			HTTP2:  h2c,
+		if ipv4Ok {
+			p = InterceptedPacket{
+				IsIPv4: ipv4Ok,
+				IPv4:   *ipv4,
+				IPv6:   layers.IPv6{},
+				TCP:    *tcp,
+				HTTP2:  h2c,
+			}
+		} else {
+			p = InterceptedPacket{
+				IsIPv4: ipv4Ok,
+				IPv4:   layers.IPv4{},
+				IPv6:   *ipv6,
+				TCP:    *tcp,
+				HTTP2:  h2c,
+			}
 		}
 
 		i.c <- p

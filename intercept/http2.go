@@ -17,7 +17,7 @@ var LayerTypeHTTP2 = gopacket.RegisterLayerType(12345, gopacket.LayerTypeMetadat
 type HTTP2 struct {
 	layers.BaseLayer
 
-	frame http2.Frame
+	Frame http2.Frame
 }
 
 func (h HTTP2) LayerType() gopacket.LayerType      { return LayerTypeHTTP2 }

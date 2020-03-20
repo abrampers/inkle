@@ -54,7 +54,7 @@ func (h *HTTP2) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
 	if err != nil {
 		return err
 	}
-	h.frame = frame
+	h.Frame = frame
 
 	return nil
 }

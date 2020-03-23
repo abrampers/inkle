@@ -17,7 +17,7 @@ var LayerTypeHTTP2 = gopacket.RegisterLayerType(12345, gopacket.LayerTypeMetadat
 type HTTP2 struct {
 	layers.BaseLayer
 
-	Frame http2.Frame
+	frames []http2.Frame
 }
 
 func (h HTTP2) LayerType() gopacket.LayerType      { return LayerTypeHTTP2 }
@@ -38,49 +38,52 @@ func decodeHTTP2(data []byte, p gopacket.PacketBuilder) error {
 	return nil
 }
 
-func (h *HTTP2) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
-	err := validateHTTP2(data)
-	if err != nil {
-		return err
-	}
-
-	var framerOutput bytes.Buffer
-	r := bytes.NewReader(data)
-	framer := http2.NewFramer(&framerOutput, r)
-
-	h.BaseLayer = layers.BaseLayer{Contents: data[:len(data)]}
-
-	frame, err := framer.ReadFrame()
-	if err != nil {
-		return err
-	}
-	h.Frame = frame
-
-	return nil
+func (h *HTTP2) Frames() []http2.Frame {
+	return h.frames
 }
 
-func validateHTTP2(payload []byte) error {
+func (h *HTTP2) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
+	var frames []http2.Frame
 	frameHeaderLength := uint32(9)
-	payloadLength := len(payload)
+	payloadLength := len(data)
 
 	payloadIdx := 0
 	for payloadIdx < payloadLength {
 		if payloadIdx+int(frameHeaderLength) > payloadLength {
-			return fmt.Errorf("packet length is not equal with the packet length mentioned in frame header")
+			return fmt.Errorf("Payload length couldn't contain Frame Headers")
 		}
 
-		frameLength := (uint32(payload[payloadIdx+0])<<16 | uint32(payload[payloadIdx+1])<<8 | uint32(payload[payloadIdx+2]))
-		rBit := payload[payloadIdx+5] >> 7
+		framePayloadLength := (uint32(data[payloadIdx+0])<<16 | uint32(data[payloadIdx+1])<<8 | uint32(data[payloadIdx+2]))
+		frameLength := int(frameHeaderLength + framePayloadLength)
+
+		rBit := data[payloadIdx+5] >> 7
 
 		if rBit != 0 {
 			return fmt.Errorf("R bit is not unset")
 		}
 
-		payloadIdx += int(frameLength + frameHeaderLength)
+		if payloadIdx+frameLength > payloadLength {
+			return fmt.Errorf("Payload length couldn't contain Payload with the length mentioned in Frame Header")
+		}
+
+		var framerOutput bytes.Buffer
+		r := bytes.NewReader(data[payloadIdx : payloadIdx+frameLength])
+		framer := http2.NewFramer(&framerOutput, r)
+
+		frame, err := framer.ReadFrame()
+		if err != nil {
+			return err
+		}
+		frames = append(frames, frame)
+
+		payloadIdx += int(frameLength)
 	}
 
 	if payloadIdx != payloadLength {
-		return fmt.Errorf("packet length is not equal with the packet length mentioned in frame header")
+		return fmt.Errorf("Payload length is not equal with the Frame length mentioned in Frame Header")
 	}
+
+	h.BaseLayer = layers.BaseLayer{Contents: data[:len(data)]}
+	h.frames = frames
 	return nil
 }

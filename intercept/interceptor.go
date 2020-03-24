@@ -1,6 +1,7 @@
 package intercept
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -57,60 +58,68 @@ func (i *PacketInterceptor) Packets() chan InterceptedPacket {
 func (i *PacketInterceptor) interceptPacket() {
 	defer close(i.c)
 
+	for packet := range i.source.Packets() {
+		itcpacket, err := extractPacket(packet)
+		if err != nil {
+			continue
+		}
+
+		i.c <- *itcpacket
+
+	}
+}
+
+func extractPacket(packet gopacket.Packet) (*InterceptedPacket, error) {
 	var h2c HTTP2
 	parser := gopacket.NewDecodingLayerParser(LayerTypeHTTP2, &h2c)
-
 	decoded := []gopacket.LayerType{}
-	for packet := range i.source.Packets() {
-		ipLayer := packet.NetworkLayer()
-		if ipLayer == nil {
-			continue
-		}
 
-		ipv4, ipv4Ok := ipLayer.(*layers.IPv4)
-		ipv6, ipv6Ok := ipLayer.(*layers.IPv6)
-		if !ipv4Ok && !ipv6Ok {
-			continue
-		}
+	netlayer := packet.NetworkLayer()
+	if netlayer == nil {
+		return nil, fmt.Errorf("No Network Layer found")
+	}
 
-		tcpLayer := packet.Layer(layers.LayerTypeTCP)
-		if tcpLayer == nil {
-			continue
-		}
+	ipv4, ipv4Ok := netlayer.(*layers.IPv4)
+	ipv6, ipv6Ok := netlayer.(*layers.IPv6)
+	if !ipv4Ok && !ipv6Ok {
+		return nil, fmt.Errorf("Failed to cast Network Layer to IPv4 or IPv6")
+	}
 
-		tcp, ok := tcpLayer.(*layers.TCP)
-		if !ok {
-			continue
-		}
+	tcplayer := packet.Layer(layers.LayerTypeTCP)
+	if tcplayer == nil {
+		return nil, fmt.Errorf("No TCP Layer found")
+	}
 
-		appLayer := packet.ApplicationLayer()
-		if appLayer == nil {
-			continue
-		}
+	tcp, ok := tcplayer.(*layers.TCP)
+	if !ok {
+		return nil, fmt.Errorf("Failed to cast TCP Layer to TCP")
+	}
 
-		packetData := appLayer.Payload()
-		if err := parser.DecodeLayers(packetData, &decoded); err != nil {
-			continue
-		}
+	applayer := packet.ApplicationLayer()
+	if applayer == nil {
+		return nil, fmt.Errorf("No Application Layer found")
+	}
 
-		if ipv4Ok {
-			p = InterceptedPacket{
-				IsIPv4: ipv4Ok,
-				IPv4:   *ipv4,
-				IPv6:   layers.IPv6{},
-				TCP:    *tcp,
-				HTTP2:  h2c,
-			}
-		} else {
-			p = InterceptedPacket{
-				IsIPv4: ipv4Ok,
-				IPv4:   layers.IPv4{},
-				IPv6:   *ipv6,
-				TCP:    *tcp,
-				HTTP2:  h2c,
-			}
-		}
+	packetData := applayer.Payload()
+	if err := parser.DecodeLayers(packetData, &decoded); err != nil {
+		return nil, fmt.Errorf("Failed to parse Application Layer payload to HTTP2")
+	}
 
-		i.c <- p
+	if ipv4Ok {
+		return &InterceptedPacket{
+			IsIPv4: ipv4Ok,
+			IPv4:   *ipv4,
+			IPv6:   layers.IPv6{},
+			TCP:    *tcp,
+			HTTP2:  h2c,
+		}, nil
+	} else {
+		return &InterceptedPacket{
+			IsIPv4: ipv4Ok,
+			IPv4:   layers.IPv4{},
+			IPv6:   *ipv6,
+			TCP:    *tcp,
+			HTTP2:  h2c,
+		}, nil
 	}
 }

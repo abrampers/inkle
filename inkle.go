@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	// "fmt"
 	"time"
 
 	"github.com/abrampers/inkle/intercept"
+	"github.com/abrampers/inkle/logging"
 )
 
 var (
@@ -25,9 +26,9 @@ func main() {
 	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
 	defer interceptor.Close()
 
-	elm := &log.NewEventLogManager{timeout: timeout}
+	elm := logging.NewEventLogManager(*timeout)
 
-	go elm.CleanupEvent()
+	go elm.CleanupExpiredRequests()
 
 	for packet := range interceptor.Packets() {
 		// if packet.IsIPv4 {
@@ -43,9 +44,9 @@ func main() {
 
 		// Check whether this request is response or not
 		if request {
-			elm.CreateRequest()
+			elm.CreateEvent(packet)
 		} else { // Response
-			elm.InsertResponse()
+			elm.InsertResponse(packet)
 		}
 	}
 }

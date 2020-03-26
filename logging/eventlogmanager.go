@@ -11,7 +11,7 @@ type EventLogManager interface {
 }
 
 type eventLogManager struct {
-	events  []EventLog
+	events  []*EventLog
 	timeout time.Duration
 }
 
@@ -20,6 +20,8 @@ func NewEventLogManager(timeout time.Duration) EventLogManager {
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource string, ipdest string, tcpdest string) {
+	e := NewEventLog(timestamp, servicename, methodname, ipsource, tcpsource, ipdest, tcpdest, "Request")
+	m.events = append(m.events, e)
 }
 
 func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, tcpsource string, ipdest string, tcpdest string, grpcstatuscode string) {
@@ -27,7 +29,7 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 
 func (m *eventLogManager) CleanupExpiredRequests() {}
 
-func isEventsEqual(a, b []EventLog) bool {
+func isEventsEqual(a, b []*EventLog) bool {
 	lena, lenb := len(a), len(b)
 
 	if lena != lenb {
@@ -35,7 +37,7 @@ func isEventsEqual(a, b []EventLog) bool {
 	}
 
 	for i := 0; i < lena; i++ {
-		if !isEventEqual(a[i], b[i]) {
+		if !isEventEqual(*a[i], *b[i]) {
 			return false
 		}
 	}

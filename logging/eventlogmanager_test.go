@@ -65,9 +65,9 @@ func TestIsEventsEqual(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		if ret := isEventsEqual(test.a, test.b); ret != test.want {
-			t.Errorf("isEventsEqual(a, b) returns '%t' while it should be '%t'", ret, test.want)
+			t.Errorf("isEventsEqual(a, b) (testcase %d): returns '%t' while it should be '%t'", i, ret, test.want)
 		}
 	}
 }
@@ -139,8 +139,186 @@ func TestAddEvent(t *testing.T) {
 		elm.addEvent(test.event)
 		if !isEventsEqual(elm.events, test.finalevents) {
 			t.Errorf("addEvent (testcase %d): doesn't add event as expected", i)
-			t.Log(elm.events)
-			t.Log(test.finalevents)
+		}
+	}
+}
+
+func TestRemoveEvent(t *testing.T) {
+	tests := []struct {
+		idx                        int
+		initialevents, finalevents []*EventLog
+		want                       bool
+	}{
+		{
+			idx:           -1,
+			initialevents: []*EventLog{},
+			finalevents:   []*EventLog{},
+			want:          false,
+		},
+		{
+			idx:           0,
+			initialevents: []*EventLog{},
+			finalevents:   []*EventLog{},
+			want:          false,
+		},
+		{
+			idx:           1,
+			initialevents: []*EventLog{},
+			finalevents:   []*EventLog{},
+			want:          false,
+		},
+		{
+			idx: -1,
+			initialevents: []*EventLog{
+				&EventLog{},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+			},
+			want: false,
+		},
+		{
+			idx: 0,
+			initialevents: []*EventLog{
+				&EventLog{},
+			},
+			finalevents: []*EventLog{},
+			want:        true,
+		},
+		{
+			idx: 1,
+			initialevents: []*EventLog{
+				&EventLog{},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+			},
+			want: false,
+		},
+		{
+			idx: -1,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: false,
+		},
+		{
+			idx: 0,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: true,
+		},
+		{
+			idx: 1,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+			},
+			want: true,
+		},
+		{
+			idx: 2,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: false,
+		},
+		{
+			idx: -1,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: false,
+		},
+		{
+			idx: 0,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: true,
+		},
+		{
+			idx: 1,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: true,
+		},
+		{
+			idx: 2,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+			},
+			want: true,
+		},
+		{
+			idx: 3,
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{servicename: "datetime.Datetime"},
+				&EventLog{servicename: "helloworld.Greeter"},
+			},
+			want: false,
+		},
+	}
+
+	for i, test := range tests {
+		elm := &eventLogManager{events: test.initialevents}
+		err := elm.removeEvent(test.idx)
+		if test.want == true && err != nil {
+			t.Errorf("removeEvent('%d') (testcase %d): returns err='%v', where there should be no error", test.idx, i, err)
+		} else if test.want == false && err == nil {
+			t.Errorf("removeEvent('%d') (testcase %d): returns no err, where there should be error", test.idx, i)
+		} else if !isEventsEqual(elm.events, test.finalevents) {
+			t.Errorf("removeEvent('%d') (testcase %d): doesn't remove events as expected", test.idx, i)
 		}
 	}
 }

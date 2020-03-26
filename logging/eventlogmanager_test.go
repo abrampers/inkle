@@ -13,7 +13,7 @@ func isEventsEqual(a, b []*EventLog) bool {
 	}
 
 	for i := 0; i < lena; i++ {
-		if !isEventEqual(*a[i], *b[i]) {
+		if !isEventEqual(a[i], b[i]) {
 			return false
 		}
 	}

@@ -12,11 +12,11 @@ type EventLogManager interface {
 
 type eventLogManager struct {
 	events  []*EventLog
-	timeout time.Duration
+	tticker *time.Ticker
 }
 
-func NewEventLogManager(timeout time.Duration) EventLogManager {
-	return &eventLogManager{timeout: timeout}
+func NewEventLogManager(tticker *time.Ticker) EventLogManager {
+	return &eventLogManager{tticker: tticker}
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource string, ipdest string, tcpdest string) {
@@ -27,4 +27,11 @@ func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, m
 func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, tcpsource string, ipdest string, tcpdest string, grpcstatuscode string) {
 }
 
-func (m *eventLogManager) CleanupExpiredRequests() {}
+func (m *eventLogManager) CleanupExpiredRequests() {
+	for _ = range m.tticker.C {
+		m.removeExpiredEvents()
+	}
+}
+
+func (m *eventLogManager) removeExpiredEvents() {
+}

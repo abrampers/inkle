@@ -1,11 +1,8 @@
 package logging
 
 import (
-	"regexp"
 	"time"
 )
-
-var re *regexp.Regexp = regexp.MustCompile(`/([a-zA-Z\.]+)/([a-zA-Z\.]+)`)
 
 type EventLog struct {
 	tstart         time.Time
@@ -21,9 +18,9 @@ type EventLog struct {
 	info           string
 }
 
-func NewEventLog(servicename string, methodname string, srcip string, srctcp string, destip string, desttcp string, info string) *EventLog {
+func NewEventLog(timestamp time.Time, servicename string, methodname string, srcip string, srctcp string, destip string, desttcp string, info string) *EventLog {
 	return &EventLog{
-		tstart:      time.Now(),
+		tstart:      timestamp,
 		servicename: servicename,
 		methodname:  methodname,
 		ipsource:    srcip,
@@ -32,4 +29,21 @@ func NewEventLog(servicename string, methodname string, srcip string, srctcp str
 		tcpdest:     desttcp,
 		info:        info,
 	}
+}
+
+func isEventEqual(a, b EventLog) bool {
+	if a.tstart != b.tstart ||
+		a.tfinish != b.tfinish ||
+		a.servicename != b.servicename ||
+		a.methodname != b.methodname ||
+		a.ipsource != b.ipsource ||
+		a.tcpsource != b.tcpsource ||
+		a.ipdest != b.ipdest ||
+		a.tcpdest != b.tcpdest ||
+		a.grpcstatuscode != b.grpcstatuscode ||
+		a.duration != b.duration ||
+		a.info != b.info {
+		return false
+	}
+	return true
 }

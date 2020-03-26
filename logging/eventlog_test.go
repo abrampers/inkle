@@ -141,7 +141,7 @@ func TestInsertResponse(t *testing.T) {
 	for i, test := range tests {
 		test.initialevent.InsertResponse(test.endtimestamp, test.grpcstatuscode, test.responseinfo)
 		if !isEventEqual(test.initialevent, test.finalevent) {
-			t.Errorf("InsertResponse (testcase %d): doesn't add event as expected", i)
+			t.Errorf("InsertResponse (testcase %d): doesn't modify event as expected", i)
 		}
 	}
 }

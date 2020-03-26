@@ -40,7 +40,7 @@ func TestParseGrpcPath(t *testing.T) {
 	for i, test := range tests {
 		servicename, methodname, err := ParseGrpcPath(test.path)
 		if test.want == true && err != nil {
-			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns err = %v, where shouldn't be no error", test.path, i, err)
+			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns err = '%v', where there should be no error", test.path, i, err)
 		} else if test.want == false && err == nil {
 			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns no err, where there should be error", string(test.path), i)
 		} else if servicename != test.servicename {

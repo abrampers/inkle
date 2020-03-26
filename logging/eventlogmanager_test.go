@@ -530,12 +530,49 @@ func TestGetEvent(t *testing.T) {
 	}
 }
 
-// func TestCleanupExpiredRequests(t *testing.T) {
-// 	tests := []struct {
-// 		initialevents []EventLog
-// 		finalevents   []EventLog
-// 	}{}
-//
-// 	for _, test := range tests {
-// 	}
-// }
+func TestRemoveExpiredEvents(t *testing.T) {
+	currtime := time.Now()
+	tests := []struct {
+		timeout       time.Duration
+		currtime      time.Time
+		initialevents []*EventLog
+		finalevents   []*EventLog
+	}{
+		{
+			timeout:       100 * time.Millisecond,
+			currtime:      currtime,
+			initialevents: []*EventLog{},
+			finalevents:   []*EventLog{},
+		},
+		{
+			timeout:  100 * time.Millisecond,
+			currtime: currtime,
+			initialevents: []*EventLog{
+				&EventLog{tstart: currtime.Add(-200 * time.Millisecond)},
+			},
+			finalevents: []*EventLog{},
+		},
+		{
+			timeout:  100 * time.Millisecond,
+			currtime: currtime,
+			initialevents: []*EventLog{
+				&EventLog{tstart: currtime.Add(-200 * time.Millisecond)},
+				&EventLog{tstart: currtime.Add(-150 * time.Millisecond)},
+				&EventLog{tstart: currtime.Add(-90 * time.Millisecond)},
+				&EventLog{tstart: currtime.Add(-80 * time.Millisecond)},
+			},
+			finalevents: []*EventLog{
+				&EventLog{tstart: currtime.Add(-90 * time.Millisecond)},
+				&EventLog{tstart: currtime.Add(-80 * time.Millisecond)},
+			},
+		},
+	}
+
+	for i, test := range tests {
+		elm := &eventLogManager{events: test.initialevents}
+		elm.removeExpiredEvents(test.currtime)
+		if !isEventsEqual(elm.events, test.finalevents) {
+			t.Errorf("removeExpired (testcase %d): didn't remove expired elements as expected", i)
+		}
+	}
+}

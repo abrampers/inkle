@@ -30,3 +30,10 @@ func NewEventLog(timestamp time.Time, servicename string, methodname string, src
 		info:        info,
 	}
 }
+
+func (e *EventLog) InsertResponse(timestamp time.Time, grpcstatuscode string, responseinfo string) {
+	e.tfinish = timestamp
+	e.grpcstatuscode = grpcstatuscode
+	e.duration = e.tfinish.Sub(e.tstart)
+	e.info += responseinfo
+}

@@ -5,6 +5,23 @@ import (
 	"time"
 )
 
+func isEventEqual(a, b EventLog) bool {
+	if a.tstart != b.tstart ||
+		a.tfinish != b.tfinish ||
+		a.servicename != b.servicename ||
+		a.methodname != b.methodname ||
+		a.ipsource != b.ipsource ||
+		a.tcpsource != b.tcpsource ||
+		a.ipdest != b.ipdest ||
+		a.tcpdest != b.tcpdest ||
+		a.grpcstatuscode != b.grpcstatuscode ||
+		a.duration != b.duration ||
+		a.info != b.info {
+		return false
+	}
+	return true
+}
+
 func TestIsEventEqual(t *testing.T) {
 	tests := []struct {
 		a    EventLog

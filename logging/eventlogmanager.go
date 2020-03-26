@@ -28,18 +28,3 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 }
 
 func (m *eventLogManager) CleanupExpiredRequests() {}
-
-func isEventsEqual(a, b []*EventLog) bool {
-	lena, lenb := len(a), len(b)
-
-	if lena != lenb {
-		return false
-	}
-
-	for i := 0; i < lena; i++ {
-		if !isEventEqual(*a[i], *b[i]) {
-			return false
-		}
-	}
-	return true
-}

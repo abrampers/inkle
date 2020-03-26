@@ -5,6 +5,21 @@ import (
 	"time"
 )
 
+func isEventsEqual(a, b []*EventLog) bool {
+	lena, lenb := len(a), len(b)
+
+	if lena != lenb {
+		return false
+	}
+
+	for i := 0; i < lena; i++ {
+		if !isEventEqual(*a[i], *b[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 func TestIsEventsEqual(t *testing.T) {
 	tests := []struct {
 		a    []*EventLog

@@ -37,3 +37,7 @@ func (e *EventLog) InsertResponse(timestamp time.Time, grpcstatuscode string, re
 	e.duration = e.tfinish.Sub(e.tstart)
 	e.info += responseinfo
 }
+
+func (e *EventLog) isMatchingRequest(ipdest string, tcpdest uint16) bool {
+	return e.ipsource == ipdest && e.tcpsource == tcpdest
+}

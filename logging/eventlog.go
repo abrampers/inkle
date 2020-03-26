@@ -18,15 +18,15 @@ type EventLog struct {
 	info           string
 }
 
-func NewEventLog(timestamp time.Time, servicename string, methodname string, srcip string, srctcp string, destip string, desttcp string, info string) *EventLog {
+func NewEventLog(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource string, ipdest string, tcpdest string, info string) *EventLog {
 	return &EventLog{
 		tstart:      timestamp,
 		servicename: servicename,
 		methodname:  methodname,
-		ipsource:    srcip,
-		tcpsource:   srctcp,
-		ipdest:      destip,
-		tcpdest:     desttcp,
+		ipsource:    ipsource,
+		tcpsource:   tcpsource,
+		ipdest:      ipdest,
+		tcpdest:     tcpdest,
 		info:        info,
 	}
 }

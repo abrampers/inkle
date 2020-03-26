@@ -37,16 +37,16 @@ func TestParseGrpcPath(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		servicename, methodname, err := ParseGrpcPath(test.path)
 		if test.want == true && err != nil {
-			t.Errorf("ParseGrpcPath(%s) returns err = %v, where shouldn't be no error", test.path, err)
+			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns err = %v, where shouldn't be no error", test.path, i, err)
 		} else if test.want == false && err == nil {
-			t.Errorf("ParseGrpcPath(%s) returns no err, where there should be error", string(test.path))
+			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns no err, where there should be error", string(test.path), i)
 		} else if servicename != test.servicename {
-			t.Errorf("ParseGrpcPath(%s) returns servicename='%s', where it should be '%s'", string(test.path), servicename, test.servicename)
+			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns servicename='%s', where it should be '%s'", string(test.path), i, servicename, test.servicename)
 		} else if methodname != test.methodname {
-			t.Errorf("ParseGrpcPath(%s) returns methodname='%s', where it should be '%s'", string(test.path), methodname, test.methodname)
+			t.Errorf("ParseGrpcPath(%s) (testcase %d): returns methodname='%s', where it should be '%s'", string(test.path), i, methodname, test.methodname)
 		}
 	}
 }

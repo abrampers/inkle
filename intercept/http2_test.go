@@ -236,15 +236,15 @@ func TestDecodeLayers(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		h2 := &HTTP2{}
 		err := h2.DecodeFromBytes(test.input, gopacket.NilDecodeFeedback)
 		if test.want == true && err != nil {
-			t.Errorf("DecodeFromBytes('%s') returns err = '%v', where shouldn't be no error", string(test.input), err)
+			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns err = '%v', where shouldn't be no error", string(test.input), i, err)
 		} else if test.want == false && err == nil {
-			t.Errorf("DecodeFromBytes('%s') returns no err, where there should be error", string(test.input))
+			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns no err, where there should be error", string(test.input), i)
 		} else if test.nstream != len(h2.Frames()) {
-			t.Errorf("DecodeFromBytes('%s') produces %d where it should be %d stream(s)", string(test.input), len(h2.Frames()), test.nstream)
+			t.Errorf("DecodeFromBytes('%s') (testcase %d): produces %d where it should be %d stream(s)", string(test.input), i, len(h2.Frames()), test.nstream)
 		}
 	}
 }

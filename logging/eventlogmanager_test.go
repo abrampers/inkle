@@ -162,10 +162,8 @@ func TestGetEvent(t *testing.T) {
 		idx                int
 	}{
 		{
-			ipsource:  "::1",
-			tcpsource: 58108,
-			ipdest:    "::1",
-			tcpdest:   8000,
+			ipdest:  "::1",
+			tcpdest: 58108,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
@@ -181,10 +179,8 @@ func TestGetEvent(t *testing.T) {
 			idx: 0,
 		},
 		{
-			ipsource:  "127.0.0.1",
-			tcpsource: 58108,
-			ipdest:    "::1",
-			tcpdest:   8000,
+			ipdest:  "127.0.0.1",
+			tcpdest: 58108,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
@@ -200,10 +196,8 @@ func TestGetEvent(t *testing.T) {
 			idx: -1,
 		},
 		{
-			ipsource:  "::1",
-			tcpsource: 58100,
-			ipdest:    "::1",
-			tcpdest:   8000,
+			ipdest:  "::1",
+			tcpdest: 58110,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
@@ -219,48 +213,8 @@ func TestGetEvent(t *testing.T) {
 			idx: -1,
 		},
 		{
-			ipsource:  "::1",
-			tcpsource: 58108,
-			ipdest:    "127.0.0.1",
-			tcpdest:   8000,
-			events: []*EventLog{
-				&EventLog{
-					tstart:      currtime,
-					servicename: "helloworld.Greeter",
-					methodname:  "SayHello",
-					ipsource:    "::1",
-					tcpsource:   58108,
-					ipdest:      "::1",
-					tcpdest:     8000,
-					info:        "Request",
-				},
-			},
-			idx: -1,
-		},
-		{
-			ipsource:  "::1",
-			tcpsource: 58108,
-			ipdest:    "::1",
-			tcpdest:   9000,
-			events: []*EventLog{
-				&EventLog{
-					tstart:      currtime,
-					servicename: "helloworld.Greeter",
-					methodname:  "SayHello",
-					ipsource:    "::1",
-					tcpsource:   58108,
-					ipdest:      "::1",
-					tcpdest:     8000,
-					info:        "Request",
-				},
-			},
-			idx: -1,
-		},
-		{
-			ipsource:  "::1",
-			tcpsource: 58108,
-			ipdest:    "::1",
-			tcpdest:   8000,
+			ipdest:  "::1",
+			tcpdest: 58108,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{
@@ -277,10 +231,8 @@ func TestGetEvent(t *testing.T) {
 			idx: 1,
 		},
 		{
-			ipsource:  "127.0.0.1",
-			tcpsource: 58108,
-			ipdest:    "::1",
-			tcpdest:   8000,
+			ipdest:  "127.0.0.1",
+			tcpdest: 58108,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{
@@ -297,50 +249,8 @@ func TestGetEvent(t *testing.T) {
 			idx: -1,
 		},
 		{
-			ipsource:  "::1",
-			tcpsource: 58100,
-			ipdest:    "::1",
-			tcpdest:   8000,
-			events: []*EventLog{
-				&EventLog{},
-				&EventLog{
-					tstart:      currtime,
-					servicename: "helloworld.Greeter",
-					methodname:  "SayHello",
-					ipsource:    "::1",
-					tcpsource:   58108,
-					ipdest:      "::1",
-					tcpdest:     8000,
-					info:        "Request",
-				},
-			},
-			idx: -1,
-		},
-		{
-			ipsource:  "::1",
-			tcpsource: 58108,
-			ipdest:    "127.0.0.1",
-			tcpdest:   8000,
-			events: []*EventLog{
-				&EventLog{},
-				&EventLog{
-					tstart:      currtime,
-					servicename: "helloworld.Greeter",
-					methodname:  "SayHello",
-					ipsource:    "::1",
-					tcpsource:   58108,
-					ipdest:      "::1",
-					tcpdest:     8000,
-					info:        "Request",
-				},
-			},
-			idx: -1,
-		},
-		{
-			ipsource:  "::1",
-			tcpsource: 58108,
-			ipdest:    "::1",
-			tcpdest:   9000,
+			ipdest:  "::1",
+			tcpdest: 58110,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{

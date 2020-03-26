@@ -90,9 +90,9 @@ func TestIsEventEqual(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		if ret := isEventEqual(test.a, test.b); ret != test.want {
-			t.Errorf("isEventEqual(a, b) returns '%t' while it should be '%t'", ret, test.want)
+			t.Errorf("isEventEqual(a, b) (testcase %d): returns '%t' while it should be '%t'", i, ret, test.want)
 		}
 	}
 }

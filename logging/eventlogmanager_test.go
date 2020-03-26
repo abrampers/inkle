@@ -72,6 +72,79 @@ func TestIsEventsEqual(t *testing.T) {
 	}
 }
 
+func TestAddEvent(t *testing.T) {
+	currtime := time.Now()
+	tests := []struct {
+		event         *EventLog
+		initialevents []*EventLog
+		finalevents   []*EventLog
+	}{
+		{
+			event: &EventLog{
+				tstart:      currtime,
+				servicename: "helloworld.Greeter",
+				methodname:  "SayHello",
+				ipsource:    "::1",
+				tcpsource:   58108,
+				ipdest:      "::1",
+				tcpdest:     8000,
+				info:        "Request",
+			},
+			initialevents: []*EventLog{},
+			finalevents: []*EventLog{
+				&EventLog{
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+		},
+		{
+			event: &EventLog{
+				tstart:      currtime,
+				servicename: "helloworld.Greeter",
+				methodname:  "SayHello",
+				ipsource:    "::1",
+				tcpsource:   58108,
+				ipdest:      "::1",
+				tcpdest:     8000,
+				info:        "Request",
+			},
+			initialevents: []*EventLog{
+				&EventLog{},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+		},
+	}
+
+	for i, test := range tests {
+		elm := &eventLogManager{events: test.initialevents}
+		elm.addEvent(test.event)
+		if !isEventsEqual(elm.events, test.finalevents) {
+			t.Errorf("addEvent (testcase %d): doesn't add event as expected", i)
+			t.Log(elm.events)
+			t.Log(test.finalevents)
+		}
+	}
+}
+
 func TestCreateEvent(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
@@ -134,11 +207,11 @@ func TestCreateEvent(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		elm := &eventLogManager{events: test.initialevents}
 		elm.CreateEvent(test.timestamp, test.servicename, test.methodname, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest)
 		if !isEventsEqual(elm.events, test.finalevents) {
-			t.Error("CreateEvent not working as expected")
+			t.Errorf("CreateEvent (testcase %d): doesn't create event as expected", i)
 		}
 	}
 }

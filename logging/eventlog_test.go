@@ -100,6 +100,7 @@ func TestIsEventEqual(t *testing.T) {
 func TestInsertResponse(t *testing.T) {
 	stimestamp := time.Now()
 	etimestamp := stimestamp.Add(200 * time.Millisecond)
+
 	tests := []struct {
 		endtimestamp   time.Time
 		grpcstatuscode string
@@ -131,7 +132,8 @@ func TestInsertResponse(t *testing.T) {
 				ipdest:         "::1",
 				tcpdest:        "8000",
 				grpcstatuscode: "0",
-				info:           "Request",
+				duration:       etimestamp.Sub(stimestamp),
+				info:           "Request - Response",
 			},
 		},
 	}

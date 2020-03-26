@@ -10,15 +10,15 @@ type EventLog struct {
 	servicename    string
 	methodname     string
 	ipsource       string
-	tcpsource      string
+	tcpsource      uint16
 	ipdest         string
-	tcpdest        string
+	tcpdest        uint16
 	grpcstatuscode string
 	duration       time.Duration
 	info           string
 }
 
-func NewEventLog(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource string, ipdest string, tcpdest string, info string) *EventLog {
+func NewEventLog(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, info string) *EventLog {
 	return &EventLog{
 		tstart:      timestamp,
 		servicename: servicename,

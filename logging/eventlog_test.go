@@ -60,7 +60,7 @@ func TestIsEventEqual(t *testing.T) {
 		},
 		{
 			a:    &EventLog{},
-			b:    &EventLog{tcpsource: "50100"},
+			b:    &EventLog{tcpsource: 50100},
 			want: false,
 		},
 		{
@@ -70,7 +70,7 @@ func TestIsEventEqual(t *testing.T) {
 		},
 		{
 			a:    &EventLog{},
-			b:    &EventLog{tcpdest: "8000"},
+			b:    &EventLog{tcpdest: 8000},
 			want: false,
 		},
 		{
@@ -117,9 +117,9 @@ func TestInsertResponse(t *testing.T) {
 				servicename: "helloworld.Greeter",
 				methodname:  "SayHello",
 				ipsource:    "::1",
-				tcpsource:   "58108",
+				tcpsource:   58108,
 				ipdest:      "::1",
-				tcpdest:     "8000",
+				tcpdest:     8000,
 				info:        "Request",
 			},
 			finalevent: &EventLog{
@@ -128,9 +128,9 @@ func TestInsertResponse(t *testing.T) {
 				servicename:    "helloworld.Greeter",
 				methodname:     "SayHello",
 				ipsource:       "::1",
-				tcpsource:      "58108",
+				tcpsource:      58108,
 				ipdest:         "::1",
-				tcpdest:        "8000",
+				tcpdest:        8000,
 				grpcstatuscode: "0",
 				duration:       etimestamp.Sub(stimestamp),
 				info:           "Request - Response",

@@ -79,9 +79,9 @@ func TestCreateEvent(t *testing.T) {
 		servicename   string
 		methodname    string
 		ipsource      string
-		tcpsource     string
+		tcpsource     uint16
 		ipdest        string
-		tcpdest       string
+		tcpdest       uint16
 		initialevents []*EventLog
 		finalevents   []*EventLog
 	}{
@@ -90,9 +90,9 @@ func TestCreateEvent(t *testing.T) {
 			servicename:   "helloworld.Greeter",
 			methodname:    "SayHello",
 			ipsource:      "::1",
-			tcpsource:     "58108",
+			tcpsource:     58108,
 			ipdest:        "::1",
-			tcpdest:       "8000",
+			tcpdest:       8000,
 			initialevents: []*EventLog{},
 			finalevents: []*EventLog{
 				&EventLog{
@@ -100,9 +100,9 @@ func TestCreateEvent(t *testing.T) {
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -112,9 +112,9 @@ func TestCreateEvent(t *testing.T) {
 			servicename: "helloworld.Greeter",
 			methodname:  "SayHello",
 			ipsource:    "::1",
-			tcpsource:   "58108",
+			tcpsource:   58108,
 			ipdest:      "::1",
-			tcpdest:     "8000",
+			tcpdest:     8000,
 			initialevents: []*EventLog{
 				&EventLog{},
 			},
@@ -125,9 +125,9 @@ func TestCreateEvent(t *testing.T) {
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -156,24 +156,25 @@ func TestCreateEvent(t *testing.T) {
 func TestGetEvent(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
-		ipsource, tcpsource, ipdest, tcpdest string
-		events                               []*EventLog
-		idx                                  int
+		ipsource, ipdest   string
+		tcpsource, tcpdest uint16
+		events             []*EventLog
+		idx                int
 	}{
 		{
 			ipsource:  "::1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "::1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -181,18 +182,18 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "127.0.0.1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "::1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -200,18 +201,18 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58100",
+			tcpsource: 58100,
 			ipdest:    "::1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -219,18 +220,18 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "127.0.0.1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -238,18 +239,18 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "::1",
-			tcpdest:   "9000",
+			tcpdest:   9000,
 			events: []*EventLog{
 				&EventLog{
 					tstart:      currtime,
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -257,18 +258,19 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "::1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
+				&EventLog{},
 				&EventLog{
 					tstart:      currtime,
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -276,9 +278,9 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "127.0.0.1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "::1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{
@@ -286,9 +288,9 @@ func TestGetEvent(t *testing.T) {
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -296,9 +298,9 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58100",
+			tcpsource: 58100,
 			ipdest:    "::1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{
@@ -306,9 +308,9 @@ func TestGetEvent(t *testing.T) {
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -316,9 +318,9 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "127.0.0.1",
-			tcpdest:   "8000",
+			tcpdest:   8000,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{
@@ -326,9 +328,9 @@ func TestGetEvent(t *testing.T) {
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -336,9 +338,9 @@ func TestGetEvent(t *testing.T) {
 		},
 		{
 			ipsource:  "::1",
-			tcpsource: "58108",
+			tcpsource: 58108,
 			ipdest:    "::1",
-			tcpdest:   "9000",
+			tcpdest:   9000,
 			events: []*EventLog{
 				&EventLog{},
 				&EventLog{
@@ -346,9 +348,9 @@ func TestGetEvent(t *testing.T) {
 					servicename: "helloworld.Greeter",
 					methodname:  "SayHello",
 					ipsource:    "::1",
-					tcpsource:   "58108",
+					tcpsource:   58108,
 					ipdest:      "::1",
-					tcpdest:     "8000",
+					tcpdest:     8000,
 					info:        "Request",
 				},
 			},
@@ -356,13 +358,13 @@ func TestGetEvent(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		elm := &eventLogManager{events: test.events}
 		event, idx := elm.getEvent(test.ipsource, test.tcpsource, test.ipdest, test.tcpdest)
 		if idx != test.idx {
-			t.Errorf("getEvent returns wrong index. Expected '%d' got '%d'.", test.idx, idx)
+			t.Errorf("getEvent (testcase %d): returns incorrect index. Expected '%d' got '%d'.", i, test.idx, idx)
 		} else if idx != -1 && event != elm.events[idx] {
-			t.Error("getEvent returns incorrect pointer.")
+			t.Errorf("getEvent (testcase %d): returns incorrect pointer.", i)
 		}
 	}
 }

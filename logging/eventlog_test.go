@@ -145,3 +145,46 @@ func TestInsertResponse(t *testing.T) {
 		}
 	}
 }
+
+func TestIsMatchingRequest(t *testing.T) {
+	tests := []struct {
+		ipdest  string
+		tcpdest uint16
+		event   *EventLog
+		want    bool
+	}{
+		{
+			ipdest:  "::1",
+			tcpdest: 58108,
+			event: &EventLog{
+				ipsource:  "::1",
+				tcpsource: 58108,
+			},
+			want: true,
+		},
+		{
+			ipdest:  "::1",
+			tcpdest: 58108,
+			event: &EventLog{
+				ipsource:  "::1",
+				tcpsource: 8000,
+			},
+			want: false,
+		},
+		{
+			ipdest:  "127.0.0.1",
+			tcpdest: 58108,
+			event: &EventLog{
+				ipsource:  "192.168.0.1",
+				tcpsource: 58108,
+			},
+			want: false,
+		},
+	}
+
+	for i, test := range tests {
+		if ret := test.event.isMatchingRequest(test.ipdest, test.tcpdest); ret != test.want {
+			t.Errorf("isMatchingRequest('%s', '%d') (testcase %d): expected '%t' got '%t'", test.ipdest, test.tcpdest, i, test.want, ret)
+		}
+	}
+}

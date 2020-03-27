@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"github.com/google/uuid"
 	"testing"
 	"time"
 )
@@ -13,7 +14,7 @@ func isEventsEqual(a, b []*EventLog) bool {
 	}
 
 	for i := 0; i < lena; i++ {
-		if !isEventEqual(a[i], b[i]) {
+		if !isEventEqualValue(a[i], b[i]) {
 			return false
 		}
 	}
@@ -144,181 +145,86 @@ func TestAddEvent(t *testing.T) {
 }
 
 func TestRemoveEvent(t *testing.T) {
+	id, id2, id3 := uuid.New(), uuid.New(), uuid.New()
 	tests := []struct {
-		idx                        int
+		id                         uuid.UUID
 		initialevents, finalevents []*EventLog
-		want                       bool
 	}{
 		{
-			idx:           -1,
+			id:            id,
 			initialevents: []*EventLog{},
 			finalevents:   []*EventLog{},
-			want:          false,
 		},
 		{
-			idx:           0,
-			initialevents: []*EventLog{},
-			finalevents:   []*EventLog{},
-			want:          false,
-		},
-		{
-			idx:           1,
-			initialevents: []*EventLog{},
-			finalevents:   []*EventLog{},
-			want:          false,
-		},
-		{
-			idx: -1,
+			id: id,
 			initialevents: []*EventLog{
-				&EventLog{},
-			},
-			finalevents: []*EventLog{
-				&EventLog{},
-			},
-			want: false,
-		},
-		{
-			idx: 0,
-			initialevents: []*EventLog{
-				&EventLog{},
+				&EventLog{id: id},
 			},
 			finalevents: []*EventLog{},
-			want:        true,
 		},
 		{
-			idx: 1,
+			id: id,
 			initialevents: []*EventLog{
-				&EventLog{},
+				&EventLog{id: id2},
 			},
 			finalevents: []*EventLog{
-				&EventLog{},
+				&EventLog{id: id2},
 			},
-			want: false,
 		},
 		{
-			idx: -1,
+			id: id,
 			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
 			},
 			finalevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
 			},
-			want: false,
 		},
 		{
-			idx: 0,
+			id: id,
 			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
 			},
 			finalevents: []*EventLog{
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
 			},
-			want: true,
 		},
 		{
-			idx: 1,
+			id: id,
 			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id2},
+				&EventLog{id: id},
+				&EventLog{id: id3},
 			},
 			finalevents: []*EventLog{
-				&EventLog{},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
 			},
-			want: true,
 		},
 		{
-			idx: 2,
+			id: id,
 			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
+				&EventLog{id: id},
 			},
 			finalevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
+				&EventLog{id: id2},
+				&EventLog{id: id3},
 			},
-			want: false,
-		},
-		{
-			idx: -1,
-			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			finalevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			want: false,
-		},
-		{
-			idx: 0,
-			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			finalevents: []*EventLog{
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			want: true,
-		},
-		{
-			idx: 1,
-			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			finalevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			want: true,
-		},
-		{
-			idx: 2,
-			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			finalevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-			},
-			want: true,
-		},
-		{
-			idx: 3,
-			initialevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			finalevents: []*EventLog{
-				&EventLog{},
-				&EventLog{servicename: "datetime.Datetime"},
-				&EventLog{servicename: "helloworld.Greeter"},
-			},
-			want: false,
 		},
 	}
 
 	for i, test := range tests {
 		elm := &eventLogManager{events: test.initialevents}
-		err := elm.removeEvent(test.idx)
-		if test.want == true && err != nil {
-			t.Errorf("removeEvent('%d') (testcase %d): returns err='%v', where there should be no error", test.idx, i, err)
-		} else if test.want == false && err == nil {
-			t.Errorf("removeEvent('%d') (testcase %d): returns no err, where there should be error", test.idx, i)
-		} else if !isEventsEqual(elm.events, test.finalevents) {
-			t.Errorf("removeEvent('%d') (testcase %d): doesn't remove events as expected", test.idx, i)
+		elm.removeEvent(test.id)
+		if !isEventsEqual(elm.events, test.finalevents) {
+			t.Errorf("removeEvent('%d') (testcase %d): doesn't remove events as expected", test.id, i)
 		}
 	}
 }

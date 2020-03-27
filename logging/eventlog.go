@@ -1,10 +1,12 @@
 package logging
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type EventLog struct {
+	id             uuid.UUID
 	tstart         time.Time
 	tfinish        time.Time
 	servicename    string
@@ -20,6 +22,7 @@ type EventLog struct {
 
 func NewEventLog(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, info string) *EventLog {
 	return &EventLog{
+		id:          uuid.New(),
 		tstart:      timestamp,
 		servicename: servicename,
 		methodname:  methodname,

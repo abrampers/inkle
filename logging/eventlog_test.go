@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func isEventEqual(a, b *EventLog) bool {
+func isEventEqualValue(a, b *EventLog) bool {
 	if a.tstart != b.tstart ||
 		a.tfinish != b.tfinish ||
 		a.servicename != b.servicename ||
@@ -22,7 +22,7 @@ func isEventEqual(a, b *EventLog) bool {
 	return true
 }
 
-func TestIsEventEqual(t *testing.T) {
+func TestIsEventEqualValue(t *testing.T) {
 	tests := []struct {
 		a    *EventLog
 		b    *EventLog
@@ -91,8 +91,8 @@ func TestIsEventEqual(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		if ret := isEventEqual(test.a, test.b); ret != test.want {
-			t.Errorf("isEventEqual(a, b) (testcase %d): returns '%t' while it should be '%t'", i, ret, test.want)
+		if ret := isEventEqualValue(test.a, test.b); ret != test.want {
+			t.Errorf("isEventEqualValue(a, b) (testcase %d): returns '%t' while it should be '%t'", i, ret, test.want)
 		}
 	}
 }
@@ -140,7 +140,7 @@ func TestInsertResponse(t *testing.T) {
 
 	for i, test := range tests {
 		test.initialevent.insertResponse(test.endtimestamp, test.grpcstatuscode, test.responseinfo)
-		if !isEventEqual(test.initialevent, test.finalevent) {
+		if !isEventEqualValue(test.initialevent, test.finalevent) {
 			t.Errorf("insertResponse (testcase %d): doesn't modify event as expected", i)
 		}
 	}

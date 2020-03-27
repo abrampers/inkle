@@ -16,11 +16,12 @@ type EventLogManager interface {
 type eventLogManager struct {
 	events  []*EventLog
 	tticker *time.Ticker
+	timeout time.Duration
 	mutex   sync.RWMutex
 }
 
-func NewEventLogManager(tticker *time.Ticker) EventLogManager {
-	return &eventLogManager{tticker: tticker}
+func NewEventLogManager(timeout time.Duration, tticker *time.Ticker) EventLogManager {
+	return &eventLogManager{timeout: timeout, tticker: tticker}
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) {
@@ -34,20 +35,12 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 func (m *eventLogManager) getEvent(ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) (event *EventLog, idx int) {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
-	i := 0
-	for {
-		// m.mutex.RLock()
-		if i >= len(m.events) {
-			// m.mutex.RUnlock()
-			return nil, -1
-		} else if event := m.events[i]; event.isMatchingRequest(ipdest, tcpdest) {
-			// m.mutex.RUnlock()
+	for i, event := range m.events {
+		if event.isMatchingRequest(ipdest, tcpdest) {
 			return event, i
-		} else {
-			i += 1
-			// m.mutex.RUnlock()
 		}
 	}
+	return nil, -1
 }
 
 func (m *eventLogManager) addEvent(event *EventLog) {
@@ -77,9 +70,30 @@ func (m *eventLogManager) removeEvent(id uuid.UUID) {
 
 func (m *eventLogManager) CleanupExpiredRequests() {
 	for currtime := range m.tticker.C {
-		m.removeExpiredEvents(currtime)
+		expiredevents := m.expiredEvents(currtime)
+		m.removeEvents(expiredevents)
+		m.printEvents(expiredevents)
 	}
 }
 
-func (m *eventLogManager) removeExpiredEvents(currtime time.Time) {
+func (m *eventLogManager) expiredEvents(currtime time.Time) []*EventLog {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
+	expiredevents := []*EventLog{}
+
+	for _, event := range m.events {
+		if currtime.Sub(event.tstart) >= m.timeout {
+			expiredevents = append(expiredevents, event)
+		}
+	}
+
+	return expiredevents
+}
+
+func (m *eventLogManager) removeEvents(events []*EventLog) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+}
+
+func (m *eventLogManager) printEvents(events []*EventLog) {
 }

@@ -1,9 +1,10 @@
 package logging
 
 import (
-	"fmt"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type EventLogManager interface {
@@ -31,18 +32,20 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 }
 
 func (m *eventLogManager) getEvent(ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) (event *EventLog, idx int) {
+	m.mutex.RLock()
+	defer m.mutex.RUnlock()
 	i := 0
 	for {
-		m.mutex.RLock()
+		// m.mutex.RLock()
 		if i >= len(m.events) {
-			m.mutex.RUnlock()
+			// m.mutex.RUnlock()
 			return nil, -1
 		} else if event := m.events[i]; event.isMatchingRequest(ipdest, tcpdest) {
-			m.mutex.RUnlock()
+			// m.mutex.RUnlock()
 			return event, i
 		} else {
 			i += 1
-			m.mutex.RUnlock()
+			// m.mutex.RUnlock()
 		}
 	}
 }
@@ -53,15 +56,23 @@ func (m *eventLogManager) addEvent(event *EventLog) {
 	m.mutex.Unlock()
 }
 
-func (m *eventLogManager) removeEvent(idx int) error {
+func (m *eventLogManager) removeEvent(id uuid.UUID) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	lenevents := len(m.events)
-	if idx >= lenevents || idx < 0 {
-		return fmt.Errorf("Index out of range. idx='%d' while len(events)='%d'", idx, lenevents)
+	var idx int
+	var event *EventLog
+	found := false
+
+	for idx, event = range m.events {
+		if event.id == id {
+			found = true
+			break
+		}
 	}
-	m.events = append(m.events[:idx], m.events[idx+1:]...)
-	return nil
+
+	if found {
+		m.events = append(m.events[:idx], m.events[idx+1:]...)
+	}
 }
 
 func (m *eventLogManager) CleanupExpiredRequests() {

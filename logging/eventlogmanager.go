@@ -11,6 +11,7 @@ type EventLogManager interface {
 	CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16)
 	InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string)
 	CleanupExpiredRequests()
+	Stop()
 }
 
 type eventLogManager struct {
@@ -20,8 +21,13 @@ type eventLogManager struct {
 	mutex   sync.RWMutex
 }
 
-func NewEventLogManager(timeout time.Duration, tticker *time.Ticker) EventLogManager {
-	return &eventLogManager{timeout: timeout, tticker: tticker}
+func NewEventLogManager(timeout time.Duration) EventLogManager {
+	return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout)}
+}
+
+// TODO: Print all remaining events as timeout
+func (m *eventLogManager) Stop() {
+	m.tticker.Stop()
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) {
@@ -114,5 +120,6 @@ func (m *eventLogManager) removeEvents(events []*EventLog) {
 	}
 }
 
+// TODO: Use ELK stack or for testing purposes, write to file
 func (m *eventLogManager) printEvents(events []*EventLog) {
 }

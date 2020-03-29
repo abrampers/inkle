@@ -76,6 +76,7 @@ func (m *eventLogManager) CleanupExpiredRequests() {
 	}
 }
 
+// This should return the events in the same order with events in the array
 func (m *eventLogManager) expiredEvents(currtime time.Time) []*EventLog {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
@@ -90,9 +91,27 @@ func (m *eventLogManager) expiredEvents(currtime time.Time) []*EventLog {
 	return expiredevents
 }
 
+// This should remove the records in order
 func (m *eventLogManager) removeEvents(events []*EventLog) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
+	rmidx, idx := 0, 0
+	for rmidx < len(events) {
+		for idx < len(m.events) {
+			if m.events[idx].id == events[rmidx].id {
+				m.events = append(m.events[:idx], m.events[idx+1:]...)
+				rmidx++
+			} else {
+				idx++
+			}
+			if rmidx >= len(events) {
+				break
+			}
+		}
+		if idx >= len(m.events) {
+			break
+		}
+	}
 }
 
 func (m *eventLogManager) printEvents(events []*EventLog) {

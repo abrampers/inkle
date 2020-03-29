@@ -516,10 +516,10 @@ func TestRemoveEvents(t *testing.T) {
 			finalevents:   []*EventLog{},
 		},
 		{
-			expiredevents: []*EventLog{
+			expiredevents: []*EventLog{},
+			initialevents: []*EventLog{
 				&EventLog{id: uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d")},
 			},
-			initialevents: []*EventLog{},
 			finalevents: []*EventLog{
 				&EventLog{id: uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d")},
 			},
@@ -560,7 +560,13 @@ func TestRemoveEvents(t *testing.T) {
 				&EventLog{id: uuid.MustParse("a4baa908-952e-41a8-97e1-89a31e365184")},
 				&EventLog{id: uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12")},
 			},
-			finalevents: []*EventLog{},
+			finalevents: []*EventLog{
+				&EventLog{id: uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d")},
+				&EventLog{id: uuid.MustParse("e48468ad-c173-48ef-be3e-81e1b3fa48b8")},
+				&EventLog{id: uuid.MustParse("c8166a03-984f-450c-94bc-3c976f60c6a9")},
+				&EventLog{id: uuid.MustParse("a4baa908-952e-41a8-97e1-89a31e365184")},
+				&EventLog{id: uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12")},
+			},
 		},
 		{
 			expiredevents: []*EventLog{

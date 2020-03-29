@@ -101,21 +101,15 @@ func (m *eventLogManager) expiredEvents(currtime time.Time) []*EventLog {
 func (m *eventLogManager) removeEvents(events []*EventLog) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	rmidx, idx := 0, 0
-	for rmidx < len(events) {
+	idx := 0
+	for _, rmevent := range events {
 		for idx < len(m.events) {
-			if m.events[idx].id == events[rmidx].id {
+			if m.events[idx].id == rmevent.id {
 				m.events = append(m.events[:idx], m.events[idx+1:]...)
-				rmidx++
+				break
 			} else {
 				idx++
 			}
-			if rmidx >= len(events) {
-				break
-			}
-		}
-		if idx >= len(m.events) {
-			break
 		}
 	}
 }

@@ -90,10 +90,10 @@ func (m *eventLogManager) expiredEvents(currtime time.Time) []*EventLog {
 
 	for _, event := range m.events {
 		if currtime.Sub(event.tstart) >= m.timeout {
+			event.insertResponse(currtime, "NULL", " - TIMEOUT")
 			expiredevents = append(expiredevents, event)
 		}
 	}
-
 	return expiredevents
 }
 

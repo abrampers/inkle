@@ -9,7 +9,7 @@ import (
 
 type EventLogManager interface {
 	CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16)
-	InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string)
+	InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string) EventLog
 	CleanupExpiredRequests()
 	Stop()
 }
@@ -35,10 +35,22 @@ func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, m
 	m.addEvent(e)
 }
 
-func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string) {
+func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string) EventLog {
+	var event *EventLog
+	var idx int
+	event, idx = m.getEvent(ipdest, tcpdest)
+	if idx == -1 {
+		event = NewEventLog(time.Time{}, "NULL", "NULL", ipdest, tcpdest, ipsource, tcpsource, "NO REQUEST")
+	} else {
+		m.removeEvent(event.id)
+	}
+
+	event.insertResponse(timestamp, grpcstatuscode, " - Response")
+	// m.printEvent(event) // Consider spawn goroutine
+	return *event
 }
 
-func (m *eventLogManager) getEvent(ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) (event *EventLog, idx int) {
+func (m *eventLogManager) getEvent(ipdest string, tcpdest uint16) (event *EventLog, idx int) {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 	for i, event := range m.events {

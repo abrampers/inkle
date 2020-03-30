@@ -7,6 +7,36 @@ import (
 	"github.com/abrampers/inkle/intercept"
 )
 
+func TestIsGRPC(t *testing.T) {
+	tests := []struct {
+		input map[string]string
+		want  bool
+	}{
+		{
+			input: map[string]string{"grpc-timeout": "1S"},
+			want:  true,
+		},
+		{
+			input: map[string]string{"grpc-encoding": "gzip"},
+			want:  true,
+		},
+		{
+			input: map[string]string{"grpc-status": "0"},
+			want:  true,
+		},
+		{
+			input: map[string]string{},
+			want:  false,
+		},
+	}
+
+	for i, test := range tests {
+		if ret := isGRPC(test.input); ret != test.want {
+			t.Errorf("isGRPC (testcase %d): expected '%t', got '%t'", i, test.want, ret)
+		}
+	}
+}
+
 func TestRequestFrame(t *testing.T) {
 	tests := []struct {
 		bytes   []byte

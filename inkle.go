@@ -78,5 +78,16 @@ func requestFrame(h2 intercept.HTTP2) (map[string]string, error) {
 }
 
 func responseFrame(h2 intercept.HTTP2) (map[string]string, error) {
-	return map[string]string{}, nil
+	for _, frame := range h2.Frames() {
+		if frame.Header().Type == http2.FrameHeaders {
+			headersframe := frame.(*http2.HeadersFrame)
+			headers := intercept.Headers(*headersframe)
+			_, containsgrpcstatus := headers["grpc-status"]
+
+			if isGRPC(headers) && containsgrpcstatus {
+				return headers, nil
+			}
+		}
+	}
+	return map[string]string{}, fmt.Errorf("No request frame")
 }

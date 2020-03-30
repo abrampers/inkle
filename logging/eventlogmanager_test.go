@@ -549,8 +549,6 @@ func TestExpiredEvents(t *testing.T) {
 		elm := &eventLogManager{timeout: test.timeout, events: test.events}
 		if ret := elm.expiredEvents(test.currtime); !isEventsEqual(ret, test.want) {
 			t.Errorf("expiredEvents('%v') (testcase %d): doesn't return events as expected", test.timeout, i)
-			t.Log(*ret[0])
-			t.Log(*test.want[0])
 		}
 	}
 }

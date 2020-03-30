@@ -30,10 +30,10 @@ func TestHeaders(t *testing.T) {
 				0x86, 0x7d, 0xf7, 0xdf, 0x71, 0xeb, 0x7f,
 			},
 			want: map[string]string{
-				"method":       "POST",
-				"scheme":       "http",
-				"path":         "/helloworld.Greeter/SayHello",
-				"authority":    "localhost:8000",
+				":method":      "POST",
+				":scheme":      "http",
+				":path":        "/helloworld.Greeter/SayHello",
+				":authority":   "localhost:8000",
 				"content-type": "application/grpc",
 				"user-agent":   "grpc-go/1.28.0-dev",
 				"te":           "trailers",
@@ -47,7 +47,7 @@ func TestHeaders(t *testing.T) {
 				0x0d, 0x26, 0x3d, 0x4c, 0x4d, 0x65, 0x64,
 			},
 			want: map[string]string{
-				"status":       "200 OK",
+				":status":      "200",
 				"content-type": "application/grpc",
 			},
 		},

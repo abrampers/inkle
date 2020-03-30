@@ -2,11 +2,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/abrampers/inkle/intercept"
 	"github.com/abrampers/inkle/logging"
 	"github.com/abrampers/inkle/utils"
+	"golang.org/x/net/http2"
 )
 
 var (
@@ -45,10 +48,35 @@ func main() {
 	}
 }
 
-func requestFrame(frame intercept.HTTP2) (map[string]string, error) {
-	return map[string]string{}, nil
+func isGRPC(headers map[string]string) bool {
+	for k, _ := range headers {
+		if strings.Contains(k, "grpc-") {
+			return true
+		}
+	}
+	return false
 }
 
-func responseFrame(frame intercept.HTTP2) (map[string]string, error) {
+func requestFrame(h2 intercept.HTTP2) (map[string]string, error) {
+	for _, frame := range h2.Frames() {
+		if frame.Header().Type == http2.FrameHeaders {
+			headersframe := frame.(*http2.HeadersFrame)
+			headers := intercept.Headers(*headersframe)
+			_, containsmethod := headers[":method"]
+			_, containsscheme := headers[":scheme"]
+			_, containspath := headers[":path"]
+			_, containsauthority := headers[":authority"]
+			_, containsgrpctimeout := headers["grpc-timeout"]
+			_, containscontenttype := headers["content-type"]
+
+			if isGRPC(headers) && containsmethod && containsscheme && containspath && containsauthority && containsgrpctimeout && containscontenttype {
+				return headers, nil
+			}
+		}
+	}
+	return map[string]string{}, fmt.Errorf("No request frame")
+}
+
+func responseFrame(h2 intercept.HTTP2) (map[string]string, error) {
 	return map[string]string{}, nil
 }

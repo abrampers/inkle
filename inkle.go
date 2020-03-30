@@ -2,11 +2,11 @@ package main
 
 import (
 	"flag"
-	// "fmt"
 	"time"
 
 	"github.com/abrampers/inkle/intercept"
 	"github.com/abrampers/inkle/logging"
+	"github.com/abrampers/inkle/utils"
 )
 
 var (
@@ -24,29 +24,31 @@ func main() {
 	flag.Parse()
 
 	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
-	defer interceptor.Close()
-
 	elm := logging.NewEventLogManager(*timeout)
+	defer elm.Stop()
+	defer interceptor.Close()
 
 	go elm.CleanupExpiredRequests()
 
 	for packet := range interceptor.Packets() {
-		// if packet.IsIPv4 {
-		// 	fmt.Println("IPv4 SrcIP:        ", packet.IPv4.SrcIP)
-		// 	fmt.Println("IPv4 DstIP:        ", packet.IPv4.DstIP)
-		// } else {
-		// 	fmt.Println("IPv6 SrcIP:        ", packet.IPv6.SrcIP)
-		// 	fmt.Println("IPv6 DstIP:        ", packet.IPv6.DstIP)
-		// }
-		// fmt.Println("TCP srcPort:       ", packet.TCP.SrcPort)
-		// fmt.Println("TCP dstPort:       ", packet.TCP.DstPort)
-		// fmt.Println("HTTP/2:            ", packet.HTTP2.Frame)
-
 		// Check whether this request is response or not
-		if request {
-			elm.CreateEvent(packet)
-		} else { // Response
-			elm.InsertResponse(packet)
+		if requestheaders, err := requestFrame(packet.HTTP2); err != nil {
+			servicename, methodname, err := utils.ParseGrpcPath(requestheaders[":path"])
+			if err != nil {
+				continue
+			}
+			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
+		} else if responseheaders, err := responseFrame(packet.HTTP2); err != nil {
+			statuscode := responseheaders["grpc-status"]
+			elm.InsertResponse(time.Now(), packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), statuscode)
 		}
 	}
+}
+
+func requestFrame(frame intercept.HTTP2) (map[string]string, error) {
+	return map[string]string{}, nil
+}
+
+func responseFrame(frame intercept.HTTP2) (map[string]string, error) {
+	return map[string]string{}, nil
 }

@@ -3,6 +3,7 @@ package intercept
 import (
 	"fmt"
 	"log"
+	"net"
 	"time"
 
 	"github.com/google/gopacket"
@@ -15,11 +16,9 @@ var (
 )
 
 type InterceptedPacket struct {
-	IsIPv4 bool
-	IPv4   layers.IPv4
-	IPv6   layers.IPv6
-	TCP    layers.TCP
-	HTTP2  HTTP2
+	SrcIP, DstIP   net.IP
+	SrcTCP, DstTCP layers.TCPPort
+	HTTP2          HTTP2
 }
 
 type PacketInterceptor struct {
@@ -107,18 +106,18 @@ func extractPacket(packet gopacket.Packet) (*InterceptedPacket, error) {
 
 	if ipv4Ok {
 		return &InterceptedPacket{
-			IsIPv4: ipv4Ok,
-			IPv4:   *ipv4,
-			IPv6:   layers.IPv6{},
-			TCP:    *tcp,
+			SrcIP:  ipv4.SrcIP,
+			DstIP:  ipv4.DstIP,
+			SrcTCP: tcp.SrcPort,
+			DstTCP: tcp.DstPort,
 			HTTP2:  h2c,
 		}, nil
 	} else {
 		return &InterceptedPacket{
-			IsIPv4: ipv4Ok,
-			IPv4:   layers.IPv4{},
-			IPv6:   *ipv6,
-			TCP:    *tcp,
+			SrcIP:  ipv6.SrcIP,
+			DstIP:  ipv6.DstIP,
+			SrcTCP: tcp.SrcPort,
+			DstTCP: tcp.DstPort,
 			HTTP2:  h2c,
 		}, nil
 	}

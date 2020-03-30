@@ -66,9 +66,8 @@ func (h *HTTP2) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
 			return fmt.Errorf("Payload length couldn't contain Payload with the length mentioned in Frame Header")
 		}
 
-		var framerOutput bytes.Buffer
 		r := bytes.NewReader(data[payloadIdx : payloadIdx+frameLength])
-		framer := http2.NewFramer(&framerOutput, r)
+		framer := http2.NewFramer(nil, r)
 
 		frame, err := framer.ReadFrame()
 		if err != nil {

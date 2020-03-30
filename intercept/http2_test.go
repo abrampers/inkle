@@ -240,7 +240,7 @@ func TestDecodeLayers(t *testing.T) {
 		h2 := &HTTP2{}
 		err := h2.DecodeFromBytes(test.input, gopacket.NilDecodeFeedback)
 		if test.want == true && err != nil {
-			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns err = '%v', where shouldn't be no error", string(test.input), i, err)
+			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns err = '%v', where there shouldn't be no error", string(test.input), i, err)
 		} else if test.want == false && err == nil {
 			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns no err, where there should be error", string(test.input), i)
 		} else if test.nstream != len(h2.Frames()) {

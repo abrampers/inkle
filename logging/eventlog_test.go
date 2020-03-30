@@ -136,6 +136,34 @@ func TestInsertResponse(t *testing.T) {
 				info:           "Request - Response",
 			},
 		},
+		{
+			endtimestamp:   etimestamp,
+			grpcstatuscode: "0",
+			responseinfo:   " - TIMEOUT",
+			initialevent: &EventLog{
+				tstart:      stimestamp,
+				servicename: "helloworld.Greeter",
+				methodname:  "SayHello",
+				ipsource:    "::1",
+				tcpsource:   58108,
+				ipdest:      "::1",
+				tcpdest:     8000,
+				info:        "Request",
+			},
+			finalevent: &EventLog{
+				tstart:         stimestamp,
+				tfinish:        etimestamp,
+				servicename:    "helloworld.Greeter",
+				methodname:     "SayHello",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       etimestamp.Sub(stimestamp),
+				info:           "Request - TIMEOUT",
+			},
+		},
 	}
 
 	for i, test := range tests {

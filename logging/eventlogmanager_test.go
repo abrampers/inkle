@@ -300,16 +300,6 @@ func TestCreateEvent(t *testing.T) {
 	}
 }
 
-// func TestInsertResponse(t *testing.T) {
-// 	tests := []struct {
-// 		initialevents []EventLog
-// 		finalevents   []EventLog
-// 	}{}
-//
-// 	for _, test := range tests {
-// 	}
-// }
-
 func TestGetEvent(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
@@ -454,46 +444,103 @@ func TestExpiredEvents(t *testing.T) {
 			timeout:  100 * time.Millisecond,
 			currtime: currtime,
 			events: []*EventLog{
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
+				&EventLog{
+					tstart: currtime.Add(-110 * time.Millisecond),
+					info:   "Request",
+				},
 			},
 			want: []*EventLog{
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
+				&EventLog{
+					tstart:         currtime.Add(-110 * time.Millisecond),
+					tfinish:        currtime,
+					grpcstatuscode: "NULL",
+					duration:       110 * time.Millisecond,
+					info:           "Request - TIMEOUT",
+				},
 			},
 		},
 		{
 			timeout:  100 * time.Millisecond,
 			currtime: currtime,
 			events: []*EventLog{
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
-				&EventLog{tstart: currtime.Add(-80 * time.Millisecond)},
+				&EventLog{
+					tstart: currtime.Add(-110 * time.Millisecond),
+					info:   "Request",
+				},
+				&EventLog{
+					tstart: currtime.Add(-80 * time.Millisecond),
+					info:   "Request",
+				},
 			},
 			want: []*EventLog{
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
+				&EventLog{
+					tstart:         currtime.Add(-110 * time.Millisecond),
+					tfinish:        currtime,
+					grpcstatuscode: "NULL",
+					duration:       110 * time.Millisecond,
+					info:           "Request - TIMEOUT",
+				},
 			},
 		},
 		{
 			timeout:  100 * time.Millisecond,
 			currtime: currtime,
 			events: []*EventLog{
-				&EventLog{tstart: currtime.Add(-80 * time.Millisecond)},
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
+				&EventLog{
+					tstart: currtime.Add(-80 * time.Millisecond),
+					info:   "Request",
+				},
+				&EventLog{
+					tstart: currtime.Add(-110 * time.Millisecond),
+					info:   "Request",
+				},
 			},
 			want: []*EventLog{
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
+				&EventLog{
+					tstart:         currtime.Add(-110 * time.Millisecond),
+					tfinish:        currtime,
+					grpcstatuscode: "NULL",
+					duration:       110 * time.Millisecond,
+					info:           "Request - TIMEOUT",
+				},
 			},
 		},
 		{
 			timeout:  100 * time.Millisecond,
 			currtime: currtime,
 			events: []*EventLog{
-				&EventLog{tstart: currtime.Add(-150 * time.Millisecond)},
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
-				&EventLog{tstart: currtime.Add(-90 * time.Millisecond)},
-				&EventLog{tstart: currtime.Add(-60 * time.Millisecond)},
+				&EventLog{
+					tstart: currtime.Add(-150 * time.Millisecond),
+					info:   "Request",
+				},
+				&EventLog{
+					tstart: currtime.Add(-110 * time.Millisecond),
+					info:   "Request",
+				},
+				&EventLog{
+					tstart: currtime.Add(-90 * time.Millisecond),
+					info:   "Request",
+				},
+				&EventLog{
+					tstart: currtime.Add(-60 * time.Millisecond),
+					info:   "Request",
+				},
 			},
 			want: []*EventLog{
-				&EventLog{tstart: currtime.Add(-150 * time.Millisecond)},
-				&EventLog{tstart: currtime.Add(-110 * time.Millisecond)},
+				&EventLog{
+					tstart:         currtime.Add(-150 * time.Millisecond),
+					tfinish:        currtime,
+					grpcstatuscode: "NULL",
+					duration:       150 * time.Millisecond,
+					info:           "Request - TIMEOUT",
+				},
+				&EventLog{
+					tstart:         currtime.Add(-110 * time.Millisecond),
+					tfinish:        currtime,
+					grpcstatuscode: "NULL",
+					duration:       110 * time.Millisecond,
+					info:           "Request - TIMEOUT",
+				},
 			},
 		},
 	}
@@ -502,6 +549,8 @@ func TestExpiredEvents(t *testing.T) {
 		elm := &eventLogManager{timeout: test.timeout, events: test.events}
 		if ret := elm.expiredEvents(test.currtime); !isEventsEqual(ret, test.want) {
 			t.Errorf("expiredEvents('%v') (testcase %d): doesn't return events as expected", test.timeout, i)
+			t.Log(*ret[0])
+			t.Log(*test.want[0])
 		}
 	}
 }

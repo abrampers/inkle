@@ -417,7 +417,7 @@ func TestGetEvent(t *testing.T) {
 
 	for i, test := range tests {
 		elm := &eventLogManager{events: test.events}
-		event, idx := elm.getEvent(test.ipsource, test.tcpsource, test.ipdest, test.tcpdest)
+		event, idx := elm.getEvent(test.ipdest, test.tcpdest)
 		if idx != test.idx {
 			t.Errorf("getEvent (testcase %d): returns incorrect index. Expected '%d' got '%d'.", i, test.idx, idx)
 		} else if idx != -1 && event != elm.events[idx] {

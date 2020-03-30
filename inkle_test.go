@@ -93,7 +93,7 @@ func TestRequestFrame(t *testing.T) {
 		if err != nil {
 			t.Errorf("requestFrame (testcase %d): wrong test case. Test case should be a valid HTTP/2 bytes", i)
 		}
-		ret, _ := requestFrame(h2)
+		ret, err := requestFrame(h2)
 		if test.want == true && err != nil {
 			t.Errorf("requestFrame (testcase %d): returns error='%v', where there shouldn't be any errors", i, err)
 		} else if test.want == false && err == nil {

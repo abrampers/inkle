@@ -14,7 +14,7 @@ func isEventsEqual(a, b []*EventLog) bool {
 	}
 
 	for i := 0; i < lena; i++ {
-		if !isEventEqualValue(a[i], b[i]) {
+		if !isEventEqualValue(*a[i], *b[i]) {
 			return false
 		}
 	}
@@ -296,6 +296,158 @@ func TestCreateEvent(t *testing.T) {
 		elm.CreateEvent(test.timestamp, test.servicename, test.methodname, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest)
 		if !isEventsEqual(elm.events, test.finalevents) {
 			t.Errorf("CreateEvent (testcase %d): doesn't create event as expected", i)
+		}
+	}
+}
+
+func TestInserResponse(t *testing.T) {
+	currtime := time.Now()
+	tests := []struct {
+		timestamp                        time.Time
+		ipsource, ipdest, grpcstatuscode string
+		tcpsource, tcpdest               uint16
+		initialevents, finalevents       []*EventLog
+		want                             EventLog
+	}{
+		{
+			timestamp:      currtime.Add(50 * time.Millisecond),
+			ipsource:       "::1",
+			tcpsource:      8000,
+			ipdest:         "::1",
+			tcpdest:        58108,
+			grpcstatuscode: "0",
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+			},
+			want: EventLog{
+				id:             uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+				tstart:         currtime,
+				tfinish:        currtime.Add(50 * time.Millisecond),
+				servicename:    "helloworld.Greeter",
+				methodname:     "SayHello",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       50 * time.Millisecond,
+				info:           "Request - Response",
+			},
+		},
+		{
+			timestamp:      currtime.Add(50 * time.Millisecond),
+			ipsource:       "::1",
+			tcpsource:      8000,
+			ipdest:         "::1",
+			tcpdest:        58108,
+			grpcstatuscode: "0",
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+				&EventLog{
+					id:          uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					id:          uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			want: EventLog{
+				// id:             uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+				tstart:         currtime,
+				tfinish:        currtime.Add(50 * time.Millisecond),
+				servicename:    "helloworld.Greeter",
+				methodname:     "SayHello",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       50 * time.Millisecond,
+				info:           "Request - Response",
+			},
+		},
+		{
+			timestamp:      currtime,
+			ipsource:       "::1",
+			tcpsource:      8000,
+			ipdest:         "::1",
+			tcpdest:        58108,
+			grpcstatuscode: "0",
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{},
+				&EventLog{},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{},
+				&EventLog{},
+			},
+			want: EventLog{
+				tstart:         time.Time{},
+				tfinish:        currtime,
+				servicename:    "NULL",
+				methodname:     "NULL",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       currtime.Sub(time.Time{}),
+				info:           "NO REQUEST - Response",
+			},
+		},
+	}
+
+	for i, test := range tests {
+		elm := &eventLogManager{events: test.initialevents}
+		if ret := elm.InsertResponse(test.timestamp, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest, test.grpcstatuscode); !isEventEqualValue(ret, test.want) {
+			t.Errorf("InsertResponse (testcase %d): printed incorrect event", i)
+		} else if !isEventsEqual(elm.events, test.finalevents) {
+			t.Errorf("InsertResponse (testcase %d): doesn't remove event as expected", i)
 		}
 	}
 }
@@ -642,50 +794,3 @@ func TestRemoveEvents(t *testing.T) {
 		}
 	}
 }
-
-// func TestRemoveExpiredEvents(t *testing.T) {
-// 	currtime := time.Now()
-// 	tests := []struct {
-// 		timeout       time.Duration
-// 		currtime      time.Time
-// 		initialevents []*EventLog
-// 		finalevents   []*EventLog
-// 	}{
-// 		{
-// 			timeout:       100 * time.Millisecond,
-// 			currtime:      currtime,
-// 			initialevents: []*EventLog{},
-// 			finalevents:   []*EventLog{},
-// 		},
-// 		{
-// 			timeout:  100 * time.Millisecond,
-// 			currtime: currtime,
-// 			initialevents: []*EventLog{
-// 				&EventLog{tstart: currtime.Add(-200 * time.Millisecond)},
-// 			},
-// 			finalevents: []*EventLog{},
-// 		},
-// 		{
-// 			timeout:  100 * time.Millisecond,
-// 			currtime: currtime,
-// 			initialevents: []*EventLog{
-// 				&EventLog{tstart: currtime.Add(-200 * time.Millisecond)},
-// 				&EventLog{tstart: currtime.Add(-150 * time.Millisecond)},
-// 				&EventLog{tstart: currtime.Add(-90 * time.Millisecond)},
-// 				&EventLog{tstart: currtime.Add(-80 * time.Millisecond)},
-// 			},
-// 			finalevents: []*EventLog{
-// 				&EventLog{tstart: currtime.Add(-90 * time.Millisecond)},
-// 				&EventLog{tstart: currtime.Add(-80 * time.Millisecond)},
-// 			},
-// 		},
-// 	}
-//
-// 	for i, test := range tests {
-// 		elm := &eventLogManager{events: test.initialevents}
-// 		elm.removeExpiredEvents(test.currtime)
-// 		if !isEventsEqual(elm.events, test.finalevents) {
-// 			t.Errorf("removeExpired (testcase %d): didn't remove expired elements as expected", i)
-// 		}
-// 	}
-// }

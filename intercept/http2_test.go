@@ -1,10 +1,79 @@
 package intercept
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/gopacket"
 )
+
+func TestLayerType(t *testing.T) {
+	tests := []struct {
+		want gopacket.LayerType
+	}{
+		{want: LayerTypeHTTP2},
+		{want: LayerTypeHTTP2},
+		{want: LayerTypeHTTP2},
+	}
+
+	for i, test := range tests {
+		h2 := &HTTP2{}
+		if h2.LayerType() != test.want {
+			t.Errorf("LayerType (testcase %d): returns incorrect layer type", i)
+		}
+	}
+}
+
+func TestPayload(t *testing.T) {
+	tests := []struct {
+		want []byte
+	}{
+		{want: nil},
+		{want: nil},
+		{want: nil},
+	}
+
+	for i, test := range tests {
+		h2 := &HTTP2{}
+		if bytes.Compare(h2.Payload(), test.want) != 0 {
+			t.Errorf("Payload (testcase %d): returns incorrect payload", i)
+		}
+	}
+}
+
+func TestCanDecode(t *testing.T) {
+	tests := []struct {
+		want gopacket.LayerType
+	}{
+		{want: LayerTypeHTTP2},
+		{want: LayerTypeHTTP2},
+		{want: LayerTypeHTTP2},
+	}
+
+	for i, test := range tests {
+		h2 := &HTTP2{}
+		if h2.CanDecode() != test.want {
+			t.Errorf("CanDecode (testcase %d): returns incorrect layer class", i)
+		}
+	}
+}
+
+func TestNextLayerType(t *testing.T) {
+	tests := []struct {
+		want gopacket.LayerType
+	}{
+		{want: gopacket.LayerTypeZero},
+		{want: gopacket.LayerTypeZero},
+		{want: gopacket.LayerTypeZero},
+	}
+
+	for i, test := range tests {
+		h2 := &HTTP2{}
+		if h2.NextLayerType() != test.want {
+			t.Errorf("NextLayerType (testcase %d): returns incorrect next layer type", i)
+		}
+	}
+}
 
 func TestDecodeLayers(t *testing.T) {
 	tests := []struct {
@@ -99,7 +168,30 @@ func TestDecodeLayers(t *testing.T) {
 		},
 		{
 			input: []byte{
-				0x47, 0x45, 0x54, 0x20, 0x2f, 0x68, 0x65, 0x61,
+				0x00, 0x00,
+			},
+			want:    false,
+			nstream: 0,
+		},
+		{
+			input: []byte{
+				0x00, 0x00, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x01,
+			},
+			want:    false,
+			nstream: 0,
+		},
+		{
+			input: []byte{
+				0x00, 0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00,
+				0x00, 0x00, 0x01, 0x01, 0x01, 0x01,
+			},
+			want:    false,
+			nstream: 0,
+		},
+		{
+			input: []byte{
+				0x47, 0x45, 0x54, 0x20, 0x2f, 0xe8, 0x65, 0x61,
 				0x6c, 0x74, 0x68, 0x79, 0x20, 0x48, 0x54, 0x54,
 				0x50, 0x2f, 0x31, 0x2e, 0x31, 0x0d, 0x0a, 0x48,
 				0x6f, 0x73, 0x74, 0x3a, 0x20, 0x31, 0x32, 0x37,
@@ -240,11 +332,11 @@ func TestDecodeLayers(t *testing.T) {
 		h2 := &HTTP2{}
 		err := h2.DecodeFromBytes(test.input, gopacket.NilDecodeFeedback)
 		if test.want == true && err != nil {
-			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns err = '%v', where there shouldn't be no error", string(test.input), i, err)
+			t.Errorf("DecodeFromBytes (testcase %d): returns err = '%v', where there shouldn't be no error", i, err)
 		} else if test.want == false && err == nil {
-			t.Errorf("DecodeFromBytes('%s') (testcase %d): returns no err, where there should be error", string(test.input), i)
+			t.Errorf("DecodeFromBytes (testcase %d): returns no err, where there should be error", i)
 		} else if test.nstream != len(h2.Frames()) {
-			t.Errorf("DecodeFromBytes('%s') (testcase %d): produces %d where it should be %d stream(s)", string(test.input), i, len(h2.Frames()), test.nstream)
+			t.Errorf("DecodeFromBytes (testcase %d): produces %d where it should be %d stream(s)", i, len(h2.Frames()), test.nstream)
 		}
 	}
 }

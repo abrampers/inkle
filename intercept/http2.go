@@ -75,7 +75,7 @@ func (h *HTTP2) DecodeFromBytes(data []byte, df gopacket.DecodeFeedback) error {
 		}
 		frames = append(frames, frame)
 
-		payloadIdx += int(frameLength)
+		payloadIdx += frameLength
 	}
 
 	if payloadIdx != payloadLength {

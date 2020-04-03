@@ -8,6 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var filename string = "inkle.log"
+
 type EventLogManager interface {
 	CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16)
 	InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string) EventLog
@@ -25,7 +27,7 @@ type eventLogManager struct {
 
 func NewEventLogManager(timeout time.Duration, isstdout bool) EventLogManager {
 	if isstdout {
-		f, err := os.OpenFile("text.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			panic(err)
 		}

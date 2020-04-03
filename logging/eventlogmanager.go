@@ -22,7 +22,7 @@ type eventLogManager struct {
 	tticker *time.Ticker
 	timeout time.Duration
 	mutex   sync.RWMutex
-	writer  *os.File
+	output  *os.File
 }
 
 func NewEventLogManager(timeout time.Duration, isstdout bool) EventLogManager {
@@ -31,15 +31,15 @@ func NewEventLogManager(timeout time.Duration, isstdout bool) EventLogManager {
 		if err != nil {
 			panic(err)
 		}
-		return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), writer: f}
+		return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), output: f}
 	}
-	return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), writer: os.Stdout}
+	return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), output: os.Stdout}
 }
 
 // TODO: Print all remaining events as timeout
 func (m *eventLogManager) Stop() {
 	m.tticker.Stop()
-	defer m.writer.Close()
+	defer m.output.Close()
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) {
@@ -58,7 +58,7 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 	}
 
 	event.insertResponse(timestamp, grpcstatuscode, " - Response")
-	// m.printEvent(event) // Consider spawn goroutine
+	m.printEvent(*event) // Consider spawn goroutine
 	return *event
 }
 
@@ -138,6 +138,12 @@ func (m *eventLogManager) removeEvents(events []*EventLog) {
 	}
 }
 
-// TODO: Use ELK stack or for testing purposes, write to file
+func (m *eventLogManager) printEvent(event EventLog) {
+	m.output.WriteString(event.String() + "\n")
+}
+
 func (m *eventLogManager) printEvents(events []*EventLog) {
+	for _, event := range events {
+		m.printEvent(*event)
+	}
 }

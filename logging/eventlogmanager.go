@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"os"
 	"sync"
 	"time"
 
@@ -19,15 +20,24 @@ type eventLogManager struct {
 	tticker *time.Ticker
 	timeout time.Duration
 	mutex   sync.RWMutex
+	writer  *os.File
 }
 
-func NewEventLogManager(timeout time.Duration) EventLogManager {
-	return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout)}
+func NewEventLogManager(timeout time.Duration, isstdout bool) EventLogManager {
+	if isstdout {
+		f, err := os.OpenFile("text.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+		return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), writer: f}
+	}
+	return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), writer: os.Stdout}
 }
 
 // TODO: Print all remaining events as timeout
 func (m *eventLogManager) Stop() {
 	m.tticker.Stop()
+	defer m.writer.Close()
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) {

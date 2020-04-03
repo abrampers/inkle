@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	timeout = flag.Duration("timeout", 2000*time.Millisecond, "Request timeout in nanosecond")
+	timeout  = flag.Duration("timeout", 2000*time.Millisecond, "Request timeout in nanosecond")
+	isstdout = flag.Bool("stdout", false, "Write logs to stdout")
 )
 
 const (
@@ -27,7 +28,7 @@ func main() {
 	flag.Parse()
 
 	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
-	elm := logging.NewEventLogManager(*timeout)
+	elm := logging.NewEventLogManager(*timeout, *isstdout)
 	defer elm.Stop()
 	defer interceptor.Close()
 

@@ -45,7 +45,7 @@ func main() {
 		} else if responseheaders, err := responseFrame(packet.HTTP2); err != nil {
 			statuscode, ok := responseheaders["grpc-status"]
 			if !ok {
-				statuscode = "NULL"
+				statuscode = "-1"
 			}
 			elm.InsertResponse(time.Now(), packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), statuscode)
 		}

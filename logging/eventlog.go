@@ -23,17 +23,16 @@ type EventLog struct {
 
 func NewEventLog(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, info string) *EventLog {
 	return &EventLog{
-		id:             uuid.New(),
-		tstart:         timestamp,
-		servicename:    servicename,
-		methodname:     methodname,
-		ipsource:       ipsource,
-		tcpsource:      tcpsource,
-		ipdest:         ipdest,
-		tcpdest:        tcpdest,
-		grpcstatuscode: "NULL",
-		duration:       0,
-		info:           info,
+		id:          uuid.New(),
+		tstart:      timestamp,
+		servicename: servicename,
+		methodname:  methodname,
+		ipsource:    ipsource,
+		tcpsource:   tcpsource,
+		ipdest:      ipdest,
+		tcpdest:     tcpdest,
+		duration:    0,
+		info:        info,
 	}
 }
 

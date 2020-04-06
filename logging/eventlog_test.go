@@ -22,7 +22,7 @@ func isEventEqualValue(a, b EventLog) bool {
 	return true
 }
 
-func TestIsEventEqualValue(t *testing.T) {
+func Test_isEventEqualValue(t *testing.T) {
 	tests := []struct {
 		a    EventLog
 		b    EventLog
@@ -97,7 +97,7 @@ func TestIsEventEqualValue(t *testing.T) {
 	}
 }
 
-func TestInsertResponse(t *testing.T) {
+func Test_insertResponse(t *testing.T) {
 	stimestamp := time.Now()
 	etimestamp := stimestamp.Add(200 * time.Millisecond)
 
@@ -174,7 +174,7 @@ func TestInsertResponse(t *testing.T) {
 	}
 }
 
-func TestIsMatchingRequest(t *testing.T) {
+func Test_isMatchingRequest(t *testing.T) {
 	tests := []struct {
 		ipdest  string
 		tcpdest uint16

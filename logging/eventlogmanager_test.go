@@ -21,7 +21,7 @@ func isEventsEqual(a, b []*EventLog) bool {
 	return true
 }
 
-func TestIsEventsEqual(t *testing.T) {
+func Test_isEventsEqual(t *testing.T) {
 	tests := []struct {
 		a    []*EventLog
 		b    []*EventLog
@@ -73,7 +73,7 @@ func TestIsEventsEqual(t *testing.T) {
 	}
 }
 
-func TestAddEvent(t *testing.T) {
+func Test_addEvent(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		event         *EventLog
@@ -144,7 +144,7 @@ func TestAddEvent(t *testing.T) {
 	}
 }
 
-func TestRemoveEvent(t *testing.T) {
+func Test_removeEvent(t *testing.T) {
 	id, id2, id3 := uuid.New(), uuid.New(), uuid.New()
 	tests := []struct {
 		id                         uuid.UUID
@@ -253,14 +253,16 @@ func TestCreateEvent(t *testing.T) {
 			initialevents: []*EventLog{},
 			finalevents: []*EventLog{
 				&EventLog{
-					tstart:      currtime,
-					servicename: "helloworld.Greeter",
-					methodname:  "SayHello",
-					ipsource:    "::1",
-					tcpsource:   58108,
-					ipdest:      "::1",
-					tcpdest:     8000,
-					info:        "Request",
+					tstart:         currtime,
+					servicename:    "helloworld.Greeter",
+					methodname:     "SayHello",
+					ipsource:       "::1",
+					tcpsource:      58108,
+					ipdest:         "::1",
+					tcpdest:        8000,
+					grpcstatuscode: "0",
+					duration:       0,
+					info:           "Request",
 				},
 			},
 		},
@@ -278,14 +280,16 @@ func TestCreateEvent(t *testing.T) {
 			finalevents: []*EventLog{
 				&EventLog{},
 				&EventLog{
-					tstart:      currtime,
-					servicename: "helloworld.Greeter",
-					methodname:  "SayHello",
-					ipsource:    "::1",
-					tcpsource:   58108,
-					ipdest:      "::1",
-					tcpdest:     8000,
-					info:        "Request",
+					tstart:         currtime,
+					servicename:    "helloworld.Greeter",
+					methodname:     "SayHello",
+					ipsource:       "::1",
+					tcpsource:      58108,
+					ipdest:         "::1",
+					tcpdest:        8000,
+					grpcstatuscode: "0",
+					duration:       0,
+					info:           "Request",
 				},
 			},
 		},
@@ -300,7 +304,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 }
 
-func TestInserResponse(t *testing.T) {
+func TestInsertResponse(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		timestamp                        time.Time
@@ -452,7 +456,7 @@ func TestInserResponse(t *testing.T) {
 	}
 }
 
-func TestGetEvent(t *testing.T) {
+func Test_getEvent(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		ipsource, ipdest   string
@@ -578,7 +582,7 @@ func TestGetEvent(t *testing.T) {
 	}
 }
 
-func TestExpiredEvents(t *testing.T) {
+func Test_expiredEvents(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		timeout  time.Duration
@@ -705,7 +709,7 @@ func TestExpiredEvents(t *testing.T) {
 	}
 }
 
-func TestRemoveEvents(t *testing.T) {
+func Test_removeEvents(t *testing.T) {
 	tests := []struct {
 		expiredevents, initialevents, finalevents []*EventLog
 	}{

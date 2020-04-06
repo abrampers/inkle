@@ -7,7 +7,7 @@ import (
 	"github.com/abrampers/inkle/intercept"
 )
 
-func TestIsGRPC(t *testing.T) {
+func Test_isGRPC(t *testing.T) {
 	tests := []struct {
 		input map[string]string
 		want  bool
@@ -37,7 +37,7 @@ func TestIsGRPC(t *testing.T) {
 	}
 }
 
-func TestRequestFrame(t *testing.T) {
+func Test_requestFrame(t *testing.T) {
 	tests := []struct {
 		bytes   []byte
 		headers map[string]string
@@ -134,7 +134,7 @@ func TestRequestFrame(t *testing.T) {
 	}
 }
 
-func TestResponseFrame(t *testing.T) {
+func Test_responseFrame(t *testing.T) {
 	tests := []struct {
 		bytes   []byte
 		headers map[string]string

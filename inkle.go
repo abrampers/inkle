@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -13,8 +15,9 @@ import (
 )
 
 var (
-	timeout  = flag.Duration("timeout", 2000*time.Millisecond, "Request timeout in nanosecond")
-	isstdout = flag.Bool("stdout", false, "Write logs to stdout")
+	isstdout  = flag.Bool("stdout", false, "Write logs to stdout")
+	outputdir = flag.String("output", "./logs", "Output directory of the logs. Ignored if -stdout flag set.")
+	timeout   = flag.Duration("timeout", 2000*time.Millisecond, "Request timeout in nanosecond")
 )
 
 const (
@@ -22,33 +25,22 @@ const (
 	snaplen     int32         = 131072
 	promiscuous bool          = false
 	itcpTimeout time.Duration = 1000 * time.Millisecond
+	filename    string        = "inkle.log"
 )
 
-func main() {
-	flag.Parse()
-
-	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
-	elm := logging.NewEventLogManager(*timeout, *isstdout)
-	defer elm.Stop()
-	defer interceptor.Close()
-
-	go elm.CleanupExpiredRequests()
-
-	for packet := range interceptor.Packets() {
-		// Check whether this request is response or not
-		if requestheaders, err := requestFrame(packet.HTTP2); err != nil {
-			servicename, methodname, err := utils.ParseGrpcPath(requestheaders[":path"])
-			if err != nil {
-				continue
-			}
-			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
-		} else if responseheaders, err := responseFrame(packet.HTTP2); err != nil {
-			statuscode, ok := responseheaders["grpc-status"]
-			if !ok {
-				statuscode = "-1"
-			}
-			elm.InsertResponse(time.Now(), packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), statuscode)
+func setupEventLogManager() logging.EventLogManager {
+	if !*isstdout {
+		fulldir := fmt.Sprintf("%s/%s", *outputdir, filename)
+		f, err := os.OpenFile(fulldir, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
 		}
+		defer f.Close()
+		l := log.New(f, "", log.LstdFlags|log.LUTC)
+		return logging.NewEventLogManager(*timeout, l)
+	} else {
+		l := log.New(os.Stdout, "", log.LstdFlags|log.LUTC)
+		return logging.NewEventLogManager(*timeout, l)
 	}
 }
 
@@ -94,4 +86,33 @@ func responseFrame(h2 intercept.HTTP2) (map[string]string, error) {
 		}
 	}
 	return map[string]string{}, fmt.Errorf("No request frame")
+}
+
+func main() {
+	flag.Parse()
+
+	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
+	defer interceptor.Close()
+
+	elm := setupEventLogManager()
+	defer elm.Stop()
+
+	go elm.CleanupExpiredRequests()
+
+	for packet := range interceptor.Packets() {
+		// Check whether this request is response or not
+		if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
+			servicename, methodname, err := utils.ParseGrpcPath(requestheaders[":path"])
+			if err != nil {
+				continue
+			}
+			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
+		} else if responseheaders, err := responseFrame(packet.HTTP2); err == nil {
+			statuscode, ok := responseheaders["grpc-status"]
+			if !ok {
+				statuscode = "-1"
+			}
+			elm.InsertResponse(time.Now(), packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), statuscode)
+		}
+	}
 }

@@ -2,14 +2,11 @@ package logging
 
 import (
 	"log"
-	"os"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
 )
-
-var filename string = "inkle.log"
 
 type EventLogManager interface {
 	CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16)
@@ -23,27 +20,16 @@ type eventLogManager struct {
 	tticker *time.Ticker
 	timeout time.Duration
 	mutex   sync.RWMutex
-	output  *os.File
 	logger  *log.Logger
 }
 
-func NewEventLogManager(timeout time.Duration, isstdout bool) EventLogManager {
-	if !isstdout {
-		f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			panic(err)
-		}
-		l := log.New(f, "", log.LstdFlags|log.LUTC)
-		return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), output: f, logger: l}
-	}
-	l := log.New(os.Stdout, "", log.LstdFlags|log.LUTC)
-	return &eventLogManager{timeout: timeout, tticker: time.NewTicker(timeout), output: os.Stdout, logger: l}
+func NewEventLogManager(t time.Duration, l *log.Logger) EventLogManager {
+	return &eventLogManager{timeout: t, tticker: time.NewTicker(t), logger: l}
 }
 
 // TODO: Print all remaining events as timeout
 func (m *eventLogManager) Stop() {
 	m.tticker.Stop()
-	defer m.output.Close()
 }
 
 func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) {

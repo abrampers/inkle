@@ -39,7 +39,9 @@ func NewEventLog(timestamp time.Time, servicename string, methodname string, ips
 func (e *EventLog) insertResponse(timestamp time.Time, grpcstatuscode string, responseinfo string) {
 	e.tfinish = timestamp
 	e.grpcstatuscode = grpcstatuscode
-	e.duration = e.tfinish.Sub(e.tstart)
+	if !e.tstart.IsZero() {
+		e.duration = e.tfinish.Sub(e.tstart)
+	}
 	e.info += responseinfo
 }
 

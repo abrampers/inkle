@@ -438,7 +438,7 @@ func TestInsertResponse(t *testing.T) {
 				ipdest:         "::1",
 				tcpdest:        8000,
 				grpcstatuscode: "0",
-				duration:       currtime.Sub(time.Time{}),
+				duration:       0,
 				info:           "NO REQUEST - Response",
 			},
 		},

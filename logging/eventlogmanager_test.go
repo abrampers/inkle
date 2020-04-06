@@ -607,7 +607,7 @@ func Test_expiredEvents(t *testing.T) {
 				&EventLog{
 					tstart:         currtime.Add(-110 * time.Millisecond),
 					tfinish:        currtime,
-					grpcstatuscode: "NULL",
+					grpcstatuscode: "-1",
 					duration:       110 * time.Millisecond,
 					info:           "Request - TIMEOUT",
 				},
@@ -630,7 +630,7 @@ func Test_expiredEvents(t *testing.T) {
 				&EventLog{
 					tstart:         currtime.Add(-110 * time.Millisecond),
 					tfinish:        currtime,
-					grpcstatuscode: "NULL",
+					grpcstatuscode: "-1",
 					duration:       110 * time.Millisecond,
 					info:           "Request - TIMEOUT",
 				},
@@ -653,7 +653,7 @@ func Test_expiredEvents(t *testing.T) {
 				&EventLog{
 					tstart:         currtime.Add(-110 * time.Millisecond),
 					tfinish:        currtime,
-					grpcstatuscode: "NULL",
+					grpcstatuscode: "-1",
 					duration:       110 * time.Millisecond,
 					info:           "Request - TIMEOUT",
 				},
@@ -684,14 +684,14 @@ func Test_expiredEvents(t *testing.T) {
 				&EventLog{
 					tstart:         currtime.Add(-150 * time.Millisecond),
 					tfinish:        currtime,
-					grpcstatuscode: "NULL",
+					grpcstatuscode: "-1",
 					duration:       150 * time.Millisecond,
 					info:           "Request - TIMEOUT",
 				},
 				&EventLog{
 					tstart:         currtime.Add(-110 * time.Millisecond),
 					tfinish:        currtime,
-					grpcstatuscode: "NULL",
+					grpcstatuscode: "-1",
 					duration:       110 * time.Millisecond,
 					info:           "Request - TIMEOUT",
 				},

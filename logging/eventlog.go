@@ -48,5 +48,5 @@ func (e *EventLog) isMatchingRequest(ipdest string, tcpdest uint16) bool {
 }
 
 func (e EventLog) String() string {
-	return fmt.Sprintf("%s, %s, %s, %s, %d, %s, %d, %s, %s, %s", e.tstart.UTC(), e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, e.grpcstatuscode, e.duration, e.info)
+	return fmt.Sprintf("%s, %s, %s, %d, %s, %d, %s, %s, %s", e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, e.grpcstatuscode, e.duration, e.info)
 }

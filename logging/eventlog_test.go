@@ -239,7 +239,7 @@ func TestString(t *testing.T) {
 				duration:       duration,
 				info:           "Request - TIMEOUT",
 			},
-			want: "2000-02-01 12:13:14 +0000 UTC, helloworld.Greeter, SayHello, ::1, 58108, ::1, 8000, 0, 2ms, Request - TIMEOUT",
+			want: "helloworld.Greeter, SayHello, ::1, 58108, ::1, 8000, 0, 2ms, Request - TIMEOUT",
 		},
 	}
 

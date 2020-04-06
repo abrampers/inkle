@@ -43,7 +43,10 @@ func main() {
 			}
 			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
 		} else if responseheaders, err := responseFrame(packet.HTTP2); err != nil {
-			statuscode := responseheaders["grpc-status"]
+			statuscode, ok := responseheaders["grpc-status"]
+			if !ok {
+				statuscode = "NULL"
+			}
 			elm.InsertResponse(time.Now(), packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), statuscode)
 		}
 	}

@@ -1,7 +1,8 @@
 package logging
 
 import (
-	"log"
+	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -20,11 +21,11 @@ type eventLogManager struct {
 	tticker *time.Ticker
 	timeout time.Duration
 	mutex   sync.RWMutex
-	logger  *log.Logger
+	file    *os.File
 }
 
-func NewEventLogManager(t time.Duration, l *log.Logger) EventLogManager {
-	return &eventLogManager{timeout: t, tticker: time.NewTicker(t), logger: l}
+func NewEventLogManager(t time.Duration, f *os.File) EventLogManager {
+	return &eventLogManager{timeout: t, tticker: time.NewTicker(t), file: f}
 }
 
 // TODO: Print all remaining events as timeout
@@ -128,10 +129,8 @@ func (m *eventLogManager) removeEvents(events []*EventLog) {
 	}
 }
 
-func (m *eventLogManager) printEvent(event EventLog) {
-	if m.logger != nil {
-		m.logger.Println(event.String())
-	}
+func (m *eventLogManager) printEvent(e EventLog) {
+	m.file.WriteString(fmt.Sprintf("%s,%s,%s,%d,%s,%d,%s,%s,%s\n", e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, e.grpcstatuscode, e.duration, e.info))
 }
 
 func (m *eventLogManager) printEvents(events []*EventLog) {

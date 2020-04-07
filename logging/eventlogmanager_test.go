@@ -2,6 +2,8 @@ package logging
 
 import (
 	"github.com/google/uuid"
+	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 )
@@ -793,6 +795,52 @@ func Test_removeEvents(t *testing.T) {
 		elm.removeEvents(test.expiredevents)
 		if !isEventsEqual(elm.events, test.finalevents) {
 			t.Errorf("removeEvents (testcase %d): doesn't remove events as expected", i)
+		}
+	}
+}
+
+func Test_printEvent(t *testing.T) {
+	stimestamp := time.Date(2000, 2, 1, 12, 13, 14, 0, time.UTC)
+	duration := 2 * time.Millisecond
+	etimestamp := stimestamp.Add(duration)
+	tests := []struct {
+		input EventLog
+		want  string
+	}{
+		{
+			input: EventLog{
+				tstart:         stimestamp,
+				tfinish:        etimestamp,
+				servicename:    "helloworld.Greeter",
+				methodname:     "SayHello",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       duration,
+				info:           "Request - TIMEOUT",
+			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,2ms,Request - TIMEOUT\n",
+		},
+	}
+
+	for i, test := range tests {
+		f, err := ioutil.TempFile("./", "Test_printEvent*.log")
+		if err != nil {
+			t.Errorf("printEvent (testcase %d): %v", i, err)
+		}
+		defer f.Close()
+		defer os.Remove(f.Name())
+		elm := &eventLogManager{file: f}
+		elm.printEvent(test.input)
+
+		buf, err := ioutil.ReadFile(f.Name())
+		if err != nil {
+			t.Errorf("printEvent (testcase %d): %v", i, err)
+		}
+		if string(buf) != test.want {
+			t.Errorf("printEvent (testcase %d): incorrect string", i)
 		}
 	}
 }

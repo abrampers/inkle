@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -17,7 +16,8 @@ import (
 var (
 	isstdout  = flag.Bool("stdout", false, "Write logs to stdout")
 	outputdir = flag.String("output", "./logs", "Output directory of the logs. Ignored if -stdout flag set.")
-	timeout   = flag.Duration("timeout", 2000*time.Millisecond, "Request timeout in nanosecond")
+	timeout   = flag.Duration("timeout", 800*time.Millisecond, "Request timeout in nanosecond")
+	err       error
 )
 
 const (
@@ -27,22 +27,6 @@ const (
 	itcpTimeout time.Duration = 1000 * time.Millisecond
 	filename    string        = "inkle.log"
 )
-
-func setupEventLogManager() logging.EventLogManager {
-	if !*isstdout {
-		fulldir := fmt.Sprintf("%s/%s", *outputdir, filename)
-		f, err := os.OpenFile(fulldir, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			panic(err)
-		}
-		defer f.Close()
-		l := log.New(f, "", log.LstdFlags|log.LUTC)
-		return logging.NewEventLogManager(*timeout, l)
-	} else {
-		l := log.New(os.Stdout, "", log.LstdFlags|log.LUTC)
-		return logging.NewEventLogManager(*timeout, l)
-	}
-}
 
 func isGRPC(headers map[string]string) bool {
 	for k, _ := range headers {
@@ -94,7 +78,18 @@ func main() {
 	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
 	defer interceptor.Close()
 
-	elm := setupEventLogManager()
+	var f *os.File
+	if !*isstdout {
+		fulldir := fmt.Sprintf("%s/%s", *outputdir, filename)
+		f, err = os.OpenFile(fulldir, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		f = os.Stdout
+	}
+
+	elm := logging.NewEventLogManager(*timeout, f)
 	defer elm.Stop()
 
 	go elm.CleanupExpiredRequests()

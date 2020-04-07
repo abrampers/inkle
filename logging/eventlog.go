@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"time"
 )
@@ -47,8 +46,4 @@ func (e *EventLog) insertResponse(timestamp time.Time, grpcstatuscode string, re
 
 func (e *EventLog) isMatchingRequest(ipdest string, tcpdest uint16) bool {
 	return e.ipsource == ipdest && e.tcpsource == tcpdest
-}
-
-func (e EventLog) String() string {
-	return fmt.Sprintf("%s, %s, %s, %d, %s, %d, %s, %s, %s", e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, e.grpcstatuscode, e.duration, e.info)
 }

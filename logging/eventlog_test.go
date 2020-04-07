@@ -216,36 +216,3 @@ func Test_isMatchingRequest(t *testing.T) {
 		}
 	}
 }
-
-func TestString(t *testing.T) {
-	stimestamp := time.Date(2000, 2, 1, 12, 13, 14, 0, time.UTC)
-	duration := 2 * time.Millisecond
-	etimestamp := stimestamp.Add(duration)
-	tests := []struct {
-		input EventLog
-		want  string
-	}{
-		{
-			input: EventLog{
-				tstart:         stimestamp,
-				tfinish:        etimestamp,
-				servicename:    "helloworld.Greeter",
-				methodname:     "SayHello",
-				ipsource:       "::1",
-				tcpsource:      58108,
-				ipdest:         "::1",
-				tcpdest:        8000,
-				grpcstatuscode: "0",
-				duration:       duration,
-				info:           "Request - TIMEOUT",
-			},
-			want: "helloworld.Greeter, SayHello, ::1, 58108, ::1, 8000, 0, 2ms, Request - TIMEOUT",
-		},
-	}
-
-	for i, test := range tests {
-		if test.input.String() != test.want {
-			t.Errorf("String (testcase %d): returns incorrect string", i)
-		}
-	}
-}

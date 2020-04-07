@@ -91,10 +91,14 @@ func (m *eventLogManager) removeEvent(id uuid.UUID) {
 
 func (m *eventLogManager) CleanupExpiredRequests() {
 	for currtime := range m.tticker.C {
-		expiredevents := m.expiredEvents(currtime)
-		m.removeEvents(expiredevents)
-		m.printEvents(expiredevents)
+		m.cleanup(currtime)
 	}
+}
+
+func (m *eventLogManager) cleanup(t time.Time) {
+	expiredevents := m.expiredEvents(t)
+	m.removeEvents(expiredevents)
+	m.printEvents(expiredevents)
 }
 
 // This should return the events in the same order with events in the array

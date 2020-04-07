@@ -826,7 +826,7 @@ func Test_printEvent(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		f, err := ioutil.TempFile("./", "Test_printEvent*.log")
+		f, err := ioutil.TempFile("", "Test_printEvent*.log")
 		if err != nil {
 			t.Errorf("printEvent (testcase %d): %v", i, err)
 		}
@@ -841,6 +841,94 @@ func Test_printEvent(t *testing.T) {
 		}
 		if string(buf) != test.want {
 			t.Errorf("printEvent (testcase %d): incorrect string", i)
+		}
+	}
+}
+
+func Test_cleanup(t *testing.T) {
+	currtime := time.Now()
+	tests := []struct {
+		time                       time.Time
+		timeout                    time.Duration
+		initialevents, finalevents []*EventLog
+		want                       string
+	}{
+		{
+			timeout:       20 * time.Millisecond,
+			time:          currtime,
+			initialevents: []*EventLog{},
+			finalevents:   []*EventLog{},
+			want:          "",
+		},
+		{
+			timeout: 20 * time.Millisecond,
+			time:    currtime,
+			initialevents: []*EventLog{
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime.Add(-25 * time.Millisecond),
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{},
+			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25ms,Request - TIMEOUT\n",
+		},
+		{
+			timeout: 20 * time.Millisecond,
+			time:    currtime,
+			initialevents: []*EventLog{
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime.Add(-25 * time.Millisecond),
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+				&EventLog{
+					id:          uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12"),
+					tstart:      currtime.Add(-25 * time.Millisecond),
+					servicename: "datetime.Datetime",
+					methodname:  "GetDatetime",
+					ipsource:    "::1",
+					tcpsource:   58110,
+					ipdest:      "::1",
+					tcpdest:     9000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{},
+			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25ms,Request - TIMEOUT\ndatetime.Datetime,GetDatetime,::1,58110,::1,9000,-1,25ms,Request - TIMEOUT\n",
+		},
+	}
+
+	for i, test := range tests {
+		f, err := ioutil.TempFile("", "Test_cleanup*.log")
+		if err != nil {
+			t.Errorf("cleanup (testcase %d): %v", i, err)
+		}
+		defer f.Close()
+		defer os.Remove(f.Name())
+		elm := &eventLogManager{file: f, events: test.initialevents}
+		elm.cleanup(test.time)
+
+		buf, err := ioutil.ReadFile(f.Name())
+		if err != nil {
+			t.Errorf("cleanup (testcase %d): %v", i, err)
+		}
+		if !isEventsEqual(elm.events, test.finalevents) {
+			t.Errorf("cleanup (testcase %d): doesn't remove events as expected", i)
+		} else if string(buf) != test.want {
+			t.Errorf("cleanup (testcase %d): incorrect string", i)
 		}
 	}
 }

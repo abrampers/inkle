@@ -24,6 +24,14 @@ func (h HTTP2) LayerType() gopacket.LayerType      { return LayerTypeHTTP2 }
 func (h *HTTP2) Payload() []byte                   { return nil }
 func (h *HTTP2) CanDecode() gopacket.LayerClass    { return LayerTypeHTTP2 }
 func (h *HTTP2) NextLayerType() gopacket.LayerType { return gopacket.LayerTypeZero }
+func (h HTTP2) String() string {
+	ret := "{ "
+	for _, frame := range h.frames {
+		ret += fmt.Sprintf("%v ", frame)
+	}
+	ret += "}"
+	return ret
+}
 
 // Now implement a decoder... this one strips off the first 4 bytes of the
 // packet.

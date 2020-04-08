@@ -134,7 +134,7 @@ func (m *eventLogManager) removeEvents(events []*EventLog) {
 }
 
 func (m *eventLogManager) printEvent(e EventLog) {
-	m.file.WriteString(fmt.Sprintf("%s,%s,%s,%d,%s,%d,%s,%s,%s\n", e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, e.grpcstatuscode, e.duration, e.info))
+	m.file.WriteString(fmt.Sprintf("%s,%s,%s,%d,%s,%d,%s,%d,%s\n", e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, e.grpcstatuscode, e.duration, e.info))
 }
 
 func (m *eventLogManager) printEvents(events []*EventLog) {

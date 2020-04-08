@@ -821,7 +821,7 @@ func Test_printEvent(t *testing.T) {
 				duration:       duration,
 				info:           "Request - TIMEOUT",
 			},
-			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,2ms,Request - TIMEOUT\n",
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,2000000,Request - TIMEOUT\n",
 		},
 	}
 
@@ -877,7 +877,7 @@ func Test_cleanup(t *testing.T) {
 				},
 			},
 			finalevents: []*EventLog{},
-			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25ms,Request - TIMEOUT\n",
+			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25000000,Request - TIMEOUT\n",
 		},
 		{
 			timeout: 20 * time.Millisecond,
@@ -907,7 +907,7 @@ func Test_cleanup(t *testing.T) {
 				},
 			},
 			finalevents: []*EventLog{},
-			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25ms,Request - TIMEOUT\ndatetime.Datetime,GetDatetime,::1,58110,::1,9000,-1,25ms,Request - TIMEOUT\n",
+			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25000000,Request - TIMEOUT\ndatetime.Datetime,GetDatetime,::1,58110,::1,9000,-1,25000000,Request - TIMEOUT\n",
 		},
 	}
 

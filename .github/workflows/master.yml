@@ -29,7 +29,7 @@ jobs:
         file: ./coverage.txt
         flags: unittests
         name: codecov-umbrella
-        fail_ci_if_error: true
+        fail_ci_if_error: false
     - name: Run build
       run: go build -v .
   build-artifact-linux:
@@ -60,7 +60,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: "inkle-${{ matrix.goos }}-${{ matrix.goarch }}"
+        name: "inkle-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.sha }}"
         path: ./inkle
   build-artifact-darwin:
     needs: test-build
@@ -90,6 +90,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v1.0.0
       with:
-        name: "inkle-${{ matrix.goos }}-${{ matrix.goarch }}"
+        name: "inkle-${{ matrix.goos }}-${{ matrix.goarch }}-${{ github.sha }}"
         path: ./inkle
       

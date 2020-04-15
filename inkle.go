@@ -37,6 +37,35 @@ func isGRPC(headers map[string]string) bool {
 	return false
 }
 
+func validateRequestFrameHeaders(headers map[string]string) error {
+	method, ok := headers[":method"]
+	if !ok {
+		return fmt.Errorf("No :method header in frame")
+	}
+	if method != "POST" {
+		return fmt.Errorf(":method is not supported")
+	}
+	scheme, ok := headers[":scheme"]
+	if !ok {
+		return fmt.Errorf("No :scheme header in frame")
+	}
+	if scheme != "http" {
+		return fmt.Errorf(":scheme is not supported")
+	}
+	return nil
+}
+
+func validateResponseFrameHeaders(headers map[string]string) error {
+	status, ok := headers[":status"]
+	if !ok {
+		return fmt.Errorf("No :status header in frame")
+	}
+	if status != "200" {
+		return fmt.Errorf("Incorrect status header")
+	}
+	return nil
+}
+
 func requestFrame(h2 ihttp2.HTTP2) (map[string]string, error) {
 	for _, frame := range h2.Frames() {
 		if frame.Header().Type == http2.FrameHeaders {

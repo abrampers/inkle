@@ -1,4 +1,4 @@
-package intercept
+package inkle
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/abrampers/http2"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
@@ -18,7 +19,7 @@ var (
 type InterceptedPacket struct {
 	SrcIP, DstIP   net.IP
 	SrcTCP, DstTCP layers.TCPPort
-	HTTP2          HTTP2
+	HTTP2          http2.HTTP2
 }
 
 type PacketInterceptor struct {

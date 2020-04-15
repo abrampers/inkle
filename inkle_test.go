@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/abrampers/inkle/intercept"
+	"github.com/abrampers/inkle/http2"
 )
 
 func Test_isGRPC(t *testing.T) {
@@ -118,7 +118,7 @@ func Test_requestFrame(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		h2 := intercept.HTTP2{}
+		h2 := http2.HTTP2{}
 		err := h2.DecodeFromBytes(test.bytes, nil)
 		if err != nil {
 			t.Errorf("requestFrame (testcase %d): wrong test case. Test case should be a valid HTTP/2 bytes", i)
@@ -209,7 +209,7 @@ func Test_responseFrame(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		h2 := intercept.HTTP2{}
+		h2 := http2.HTTP2{}
 		err := h2.DecodeFromBytes(test.bytes, nil)
 		if err != nil {
 			t.Errorf("requestFrame (testcase %d): wrong test case. Test case should be a valid HTTP/2 bytes", i)

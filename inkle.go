@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abrampers/inkle/intercept"
+	ihttp2 "github.com/abrampers/inkle/http2"
 	"github.com/abrampers/inkle/logging"
 	"github.com/abrampers/inkle/utils"
 	"golang.org/x/net/http2"
@@ -37,11 +37,11 @@ func isGRPC(headers map[string]string) bool {
 	return false
 }
 
-func requestFrame(h2 intercept.HTTP2) (map[string]string, error) {
+func requestFrame(h2 ihttp2.HTTP2) (map[string]string, error) {
 	for _, frame := range h2.Frames() {
 		if frame.Header().Type == http2.FrameHeaders {
 			headersframe := frame.(*http2.HeadersFrame)
-			headers := intercept.Headers(*headersframe)
+			headers := ihttp2.Headers(*headersframe)
 			_, containsmethod := headers[":method"]
 			_, containsscheme := headers[":scheme"]
 			_, containspath := headers[":path"]
@@ -57,11 +57,11 @@ func requestFrame(h2 intercept.HTTP2) (map[string]string, error) {
 	return map[string]string{}, fmt.Errorf("No request frame")
 }
 
-func responseFrame(h2 intercept.HTTP2) (map[string]string, error) {
+func responseFrame(h2 ihttp2.HTTP2) (map[string]string, error) {
 	for _, frame := range h2.Frames() {
 		if frame.Header().Type == http2.FrameHeaders {
 			headersframe := frame.(*http2.HeadersFrame)
-			headers := intercept.Headers(*headersframe)
+			headers := ihttp2.Headers(*headersframe)
 			_, containsgrpcstatus := headers["grpc-status"]
 
 			if isGRPC(headers) && containsgrpcstatus {
@@ -75,7 +75,7 @@ func responseFrame(h2 intercept.HTTP2) (map[string]string, error) {
 func main() {
 	flag.Parse()
 
-	interceptor := intercept.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
+	interceptor := NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
 	defer interceptor.Close()
 
 	var f *os.File

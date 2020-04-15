@@ -101,6 +101,19 @@ func responseFrame(h2 ihttp2.HTTP2) (map[string]string, error) {
 	return map[string]string{}, fmt.Errorf("No request frame")
 }
 
+func getHeaders(h2 ihttp2.HTTP2) map[string]string {
+	headers := map[string]string{}
+	for _, frame := range h2.Frames() {
+		if frame.Header().Type == http2.FrameHeaders {
+			headersframe := frame.(*http2.HeadersFrame)
+			for k, v := range ihttp2.Headers(*headersframe) {
+				headers[k] = v
+			}
+		}
+	}
+	return headers
+}
+
 func main() {
 	flag.Parse()
 
@@ -124,6 +137,7 @@ func main() {
 	go elm.CleanupExpiredRequests()
 
 	for packet := range interceptor.Packets() {
+		// headers := getHeaders(packet.HTTP2)
 		// Check whether this request is response or not
 		if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
 			servicename, methodname, err := utils.ParseGrpcPath(requestheaders[":path"])

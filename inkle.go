@@ -15,7 +15,7 @@ import (
 
 var (
 	isstdout  = flag.Bool("stdout", false, "Write logs to stdout")
-	outputdir = flag.String("output", "./logs", "Output directory of the logs. Ignored if -stdout flag set.")
+	outputdir = flag.String("output", ".", "Output directory of the logs. Ignored if -stdout flag set.")
 	timeout   = flag.Duration("timeout", 800*time.Millisecond, "Request timeout in nanosecond")
 	err       error
 )

@@ -32,13 +32,43 @@ jobs:
         fail_ci_if_error: true
     - name: Run build
       run: go build -v .
-  build-artifact:
+  build-artifact-linux:
     needs: test-build
     name: Build executable for ${{ matrix.goos }}/${{ matrix.goarch }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        goos: [darwin, linux]
+        goos: [linux]
+        goarch: ["386", amd64]
+    steps:
+    - name: Install libpcap-dev
+      run: sudo apt-get install libpcap-dev
+    - name: Set up Go 1.13
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13
+      id: go
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+    - name: Get dependencies
+      run: go get .
+    - name: Run go build
+      run: go build -o .
+      env:
+        GOARCH: ${{ matrix.goarch }}
+        GOOS: ${{ matrix.goos }}
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: "inkle-${{ matrix.goos }}-${{ matrix.goarch }}"
+        path: ./inkle
+  build-artifact-darwin:
+    needs: test-build
+    name: Build executable for ${{ matrix.goos }}/${{ matrix.goarch }}
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        goos: [darwin]
         goarch: ["386", amd64]
     steps:
     - name: Install libpcap-dev

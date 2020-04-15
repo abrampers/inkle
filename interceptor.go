@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/abrampers/http2"
+	"github.com/abrampers/inkle/http2"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"

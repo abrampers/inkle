@@ -137,16 +137,20 @@ func main() {
 	go elm.CleanupExpiredRequests()
 
 	for packet := range interceptor.Packets() {
-		// headers := getHeaders(packet.HTTP2)
+		headers := getHeaders(packet.HTTP2)
 		// Check whether this request is response or not
-		if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
-			servicename, methodname, err := utils.ParseGrpcPath(requestheaders[":path"])
+		// if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
+		if err := validateRequestFrameHeaders(headers); err == nil {
+			ihttp2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
+			servicename, methodname, err := utils.ParseGrpcPath(headers[":path"])
 			if err != nil {
 				continue
 			}
 			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
-		} else if responseheaders, err := responseFrame(packet.HTTP2); err == nil {
-			statuscode, ok := responseheaders["grpc-status"]
+			// } else if responseheaders, err := responseFrame(packet.HTTP2); err == nil {
+		} else if err := validateResponseFrameHeaders(headers); err == nil {
+			ihttp2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
+			statuscode, ok := headers["grpc-status"]
 			if !ok {
 				statuscode = "-1"
 			}

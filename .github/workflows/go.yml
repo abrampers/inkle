@@ -12,6 +12,8 @@ jobs:
     name: Build
     runs-on: ubuntu-18.04
     steps:
+    - name: Install libpcap-dev
+      run: sudo apt-get install libpcap-dev
 
     - name: Set up Go 1.13
       uses: actions/setup-go@v1

@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/abrampers/inkle/http2"
@@ -26,15 +25,6 @@ const (
 	itcpTimeout time.Duration = 1000 * time.Millisecond
 	filename    string        = "inkle.log"
 )
-
-func isGRPC(headers map[string]string) bool {
-	for k, _ := range headers {
-		if strings.Contains(k, "grpc-") {
-			return true
-		}
-	}
-	return false
-}
 
 func validateRequestFrameHeaders(headers map[string]string) error {
 	method, ok := headers[":method"]
@@ -64,41 +54,6 @@ func validateResponseFrameHeaders(headers map[string]string) error {
 	}
 	return nil
 }
-
-// func requestFrame(h2 http2.HTTP2) (map[string]string, error) {
-// 	for _, frame := range h2.Frames() {
-// 		if frame.Header().Type == http2.FrameHeaders {
-// 			headersframe := frame.(*http2.HeadersFrame)
-// 			headers := http2.Headers(*headersframe)
-// 			_, containsmethod := headers[":method"]
-// 			_, containsscheme := headers[":scheme"]
-// 			_, containspath := headers[":path"]
-// 			_, containsauthority := headers[":authority"]
-// 			_, containsgrpctimeout := headers["grpc-timeout"]
-// 			_, containscontenttype := headers["content-type"]
-//
-// 			if isGRPC(headers) && containsmethod && containsscheme && containspath && containsauthority && containsgrpctimeout && containscontenttype {
-// 				return headers, nil
-// 			}
-// 		}
-// 	}
-// 	return map[string]string{}, fmt.Errorf("No request frame")
-// }
-//
-// func responseFrame(h2 http2.HTTP2) (map[string]string, error) {
-// 	for _, frame := range h2.Frames() {
-// 		if frame.Header().Type == http2.FrameHeaders {
-// 			headersframe := frame.(*http2.HeadersFrame)
-// 			headers := http2.Headers(*headersframe)
-// 			_, containsgrpcstatus := headers["grpc-status"]
-//
-// 			if isGRPC(headers) && containsgrpcstatus {
-// 				return headers, nil
-// 			}
-// 		}
-// 	}
-// 	return map[string]string{}, fmt.Errorf("No request frame")
-// }
 
 func main() {
 	flag.Parse()

@@ -1,4 +1,4 @@
-package inkle
+package main
 
 import (
 	"fmt"

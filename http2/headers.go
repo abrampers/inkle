@@ -1,4 +1,4 @@
-package intercept
+package http2
 
 import (
 	"golang.org/x/net/http2"

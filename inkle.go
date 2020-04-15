@@ -7,10 +7,9 @@ import (
 	"strings"
 	"time"
 
-	ihttp2 "github.com/abrampers/inkle/http2"
+	"github.com/abrampers/inkle/http2"
 	"github.com/abrampers/inkle/logging"
 	"github.com/abrampers/inkle/utils"
-	"golang.org/x/net/http2"
 )
 
 var (
@@ -66,58 +65,45 @@ func validateResponseFrameHeaders(headers map[string]string) error {
 	return nil
 }
 
-func requestFrame(h2 ihttp2.HTTP2) (map[string]string, error) {
-	for _, frame := range h2.Frames() {
-		if frame.Header().Type == http2.FrameHeaders {
-			headersframe := frame.(*http2.HeadersFrame)
-			headers := ihttp2.Headers(*headersframe)
-			_, containsmethod := headers[":method"]
-			_, containsscheme := headers[":scheme"]
-			_, containspath := headers[":path"]
-			_, containsauthority := headers[":authority"]
-			_, containsgrpctimeout := headers["grpc-timeout"]
-			_, containscontenttype := headers["content-type"]
-
-			if isGRPC(headers) && containsmethod && containsscheme && containspath && containsauthority && containsgrpctimeout && containscontenttype {
-				return headers, nil
-			}
-		}
-	}
-	return map[string]string{}, fmt.Errorf("No request frame")
-}
-
-func responseFrame(h2 ihttp2.HTTP2) (map[string]string, error) {
-	for _, frame := range h2.Frames() {
-		if frame.Header().Type == http2.FrameHeaders {
-			headersframe := frame.(*http2.HeadersFrame)
-			headers := ihttp2.Headers(*headersframe)
-			_, containsgrpcstatus := headers["grpc-status"]
-
-			if isGRPC(headers) && containsgrpcstatus {
-				return headers, nil
-			}
-		}
-	}
-	return map[string]string{}, fmt.Errorf("No request frame")
-}
-
-func getHeaders(h2 ihttp2.HTTP2) map[string]string {
-	headers := map[string]string{}
-	for _, frame := range h2.Frames() {
-		if frame.Header().Type == http2.FrameHeaders {
-			headersframe := frame.(*http2.HeadersFrame)
-			for k, v := range ihttp2.Headers(*headersframe) {
-				headers[k] = v
-			}
-		}
-	}
-	return headers
-}
+// func requestFrame(h2 http2.HTTP2) (map[string]string, error) {
+// 	for _, frame := range h2.Frames() {
+// 		if frame.Header().Type == http2.FrameHeaders {
+// 			headersframe := frame.(*http2.HeadersFrame)
+// 			headers := http2.Headers(*headersframe)
+// 			_, containsmethod := headers[":method"]
+// 			_, containsscheme := headers[":scheme"]
+// 			_, containspath := headers[":path"]
+// 			_, containsauthority := headers[":authority"]
+// 			_, containsgrpctimeout := headers["grpc-timeout"]
+// 			_, containscontenttype := headers["content-type"]
+//
+// 			if isGRPC(headers) && containsmethod && containsscheme && containspath && containsauthority && containsgrpctimeout && containscontenttype {
+// 				return headers, nil
+// 			}
+// 		}
+// 	}
+// 	return map[string]string{}, fmt.Errorf("No request frame")
+// }
+//
+// func responseFrame(h2 http2.HTTP2) (map[string]string, error) {
+// 	for _, frame := range h2.Frames() {
+// 		if frame.Header().Type == http2.FrameHeaders {
+// 			headersframe := frame.(*http2.HeadersFrame)
+// 			headers := http2.Headers(*headersframe)
+// 			_, containsgrpcstatus := headers["grpc-status"]
+//
+// 			if isGRPC(headers) && containsgrpcstatus {
+// 				return headers, nil
+// 			}
+// 		}
+// 	}
+// 	return map[string]string{}, fmt.Errorf("No request frame")
+// }
 
 func main() {
 	flag.Parse()
 
-	interceptor := NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
+	interceptor := http2.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
 	defer interceptor.Close()
 
 	var f *os.File
@@ -137,11 +123,11 @@ func main() {
 	go elm.CleanupExpiredRequests()
 
 	for packet := range interceptor.Packets() {
-		headers := getHeaders(packet.HTTP2)
+		headers := http2.Headers(packet.HTTP2)
 		// Check whether this request is response or not
 		// if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
 		if err := validateRequestFrameHeaders(headers); err == nil {
-			ihttp2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
+			http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
 			servicename, methodname, err := utils.ParseGrpcPath(headers[":path"])
 			if err != nil {
 				continue
@@ -149,7 +135,7 @@ func main() {
 			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
 			// } else if responseheaders, err := responseFrame(packet.HTTP2); err == nil {
 		} else if err := validateResponseFrameHeaders(headers); err == nil {
-			ihttp2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
+			http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
 			statuscode, ok := headers["grpc-status"]
 			if !ok {
 				statuscode = "-1"

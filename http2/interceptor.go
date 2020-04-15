@@ -1,4 +1,4 @@
-package main
+package http2
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"net"
 	"time"
 
-	"github.com/abrampers/inkle/http2"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
@@ -19,7 +18,7 @@ var (
 type InterceptedPacket struct {
 	SrcIP, DstIP   net.IP
 	SrcTCP, DstTCP layers.TCPPort
-	HTTP2          http2.HTTP2
+	HTTP2          HTTP2
 }
 
 type PacketInterceptor struct {
@@ -70,8 +69,8 @@ func (i *PacketInterceptor) interceptPacket() {
 }
 
 func extractPacket(packet gopacket.Packet) (*InterceptedPacket, error) {
-	var h2c http2.HTTP2
-	parser := gopacket.NewDecodingLayerParser(http2.LayerTypeHTTP2, &h2c)
+	var h2c HTTP2
+	parser := gopacket.NewDecodingLayerParser(LayerTypeHTTP2, &h2c)
 	decoded := []gopacket.LayerType{}
 
 	netlayer := packet.NetworkLayer()

@@ -11,7 +11,7 @@ type HeadersState struct {
 	state map[ipTcpConn]map[string]string
 }
 
-var State = &HeadersState{}
+var State = &HeadersState{state: map[ipTcpConn]map[string]string{}}
 
 func (s *HeadersState) Headers(srcip string, srctcp uint16, dstip string, dsttcp uint16) map[string]string {
 	if val, ok := s.state[ipTcpConn{srcip, srctcp, dstip, dsttcp}]; ok && val != nil {

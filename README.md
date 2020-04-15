@@ -37,6 +37,6 @@ $ inkle -stdout
 - [ ] Repo description.
 - [ ] Repo architecture.
 - [x] HTTP/2 frame classification.
-- [ ] State management to support gRPC connection reuse.
+- [x] State management to support gRPC connection reuse.
 - [ ] Ensure correctness while ignoring unsupported streams.
 - [ ] Support for gRPC streams.

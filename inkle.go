@@ -128,6 +128,7 @@ func main() {
 		// if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
 		if err := validateRequestFrameHeaders(headers); err == nil {
 			http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
+			headers = http2.State.Headers(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
 			servicename, methodname, err := utils.ParseGrpcPath(headers[":path"])
 			if err != nil {
 				continue
@@ -136,6 +137,7 @@ func main() {
 			// } else if responseheaders, err := responseFrame(packet.HTTP2); err == nil {
 		} else if err := validateResponseFrameHeaders(headers); err == nil {
 			http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
+			headers = http2.State.Headers(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
 			statuscode, ok := headers["grpc-status"]
 			if !ok {
 				statuscode = "-1"

@@ -5,12 +5,6 @@
 
 Log Based gRPC Tracing System 𝌘
 
-## TODO: Description
-Put description here
-
-## TODO: Architecture
-Put architecture here
-
 ## Log format
 ```
 grpc_service_name,grpc_method_name,src_ip,src_tcp,dst_ip,dst_tcp,grpc_status_code,duration, info
@@ -40,7 +34,8 @@ $ inkle -stdout
 ```
 
 ## Roadmap
-
+- [ ] Repo description.
+- [ ] Repo architecture.
 - [x] HTTP/2 frame classification.
 - [ ] State management to support gRPC connection reuse.
 - [ ] Ensure correctness while ignoring unsupported streams.

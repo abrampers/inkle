@@ -5,9 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
 jobs:
-  build:
+  test-build:
     name: Test & Build
     runs-on: ubuntu-latest
     steps:
@@ -34,13 +33,13 @@ jobs:
     - name: Run build
       run: go build -v .
   build-artifact:
-    needs: build
+    needs: test-build
     name: Build executable for ${{ matrix.goos }}/${{ matrix.goarch }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         goos: [darwin, linux]
-        goarch: ["368", amd64]
+        goarch: ["386", amd64]
     steps:
     - name: Install libpcap-dev
       run: sudo apt-get install libpcap-dev
@@ -54,7 +53,7 @@ jobs:
     - name: Get dependencies
       run: go get .
     - name: Run go build
-      run: go build -v . -o .
+      run: go build -o .
       env:
         GOARCH: ${{ matrix.goarch }}
         GOOS: ${{ matrix.goos }}

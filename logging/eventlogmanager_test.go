@@ -243,6 +243,7 @@ func TestCreateEvent(t *testing.T) {
 		tcpdest       uint16
 		initialevents []*EventLog
 		finalevents   []*EventLog
+		want          string
 	}{
 		{
 			timestamp:     currtime,
@@ -266,6 +267,7 @@ func TestCreateEvent(t *testing.T) {
 					info:        "Request",
 				},
 			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,0,Request\n",
 		},
 		{
 			timestamp:   currtime,
@@ -292,12 +294,15 @@ func TestCreateEvent(t *testing.T) {
 					info:        "Request",
 				},
 			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,0,Request\n",
 		},
 	}
 
 	for i, test := range tests {
 		elm := &eventLogManager{events: test.initialevents}
-		elm.CreateEvent(test.timestamp, test.servicename, test.methodname, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest)
+		if ret := elm.CreateEvent(test.timestamp, test.servicename, test.methodname, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest); ret != test.want {
+			t.Errorf("CreateEvent (testcase %d): prints incorrect event", i)
+		}
 		if !isEventsEqual(elm.events, test.finalevents) {
 			t.Errorf("CreateEvent (testcase %d): doesn't create event as expected", i)
 		}
@@ -311,7 +316,7 @@ func TestInsertResponse(t *testing.T) {
 		ipsource, ipdest, grpcstatuscode string
 		tcpsource, tcpdest               uint16
 		initialevents, finalevents       []*EventLog
-		want                             EventLog
+		want                             string
 	}{
 		{
 			timestamp:      currtime.Add(50 * time.Millisecond),
@@ -337,20 +342,7 @@ func TestInsertResponse(t *testing.T) {
 			finalevents: []*EventLog{
 				&EventLog{},
 			},
-			want: EventLog{
-				id:             uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
-				tstart:         currtime,
-				tfinish:        currtime.Add(50 * time.Millisecond),
-				servicename:    "helloworld.Greeter",
-				methodname:     "SayHello",
-				ipsource:       "::1",
-				tcpsource:      58108,
-				ipdest:         "::1",
-				tcpdest:        8000,
-				grpcstatuscode: "0",
-				duration:       50 * time.Millisecond,
-				info:           "Request - Response",
-			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
 		},
 		{
 			timestamp:      currtime.Add(50 * time.Millisecond),
@@ -398,20 +390,7 @@ func TestInsertResponse(t *testing.T) {
 					info:        "Request",
 				},
 			},
-			want: EventLog{
-				// id:             uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
-				tstart:         currtime,
-				tfinish:        currtime.Add(50 * time.Millisecond),
-				servicename:    "helloworld.Greeter",
-				methodname:     "SayHello",
-				ipsource:       "::1",
-				tcpsource:      58108,
-				ipdest:         "::1",
-				tcpdest:        8000,
-				grpcstatuscode: "0",
-				duration:       50 * time.Millisecond,
-				info:           "Request - Response",
-			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
 		},
 		{
 			timestamp:      currtime,
@@ -430,27 +409,16 @@ func TestInsertResponse(t *testing.T) {
 				&EventLog{},
 				&EventLog{},
 			},
-			want: EventLog{
-				tstart:         time.Time{},
-				tfinish:        currtime,
-				servicename:    "NULL",
-				methodname:     "NULL",
-				ipsource:       "::1",
-				tcpsource:      58108,
-				ipdest:         "::1",
-				tcpdest:        8000,
-				grpcstatuscode: "0",
-				duration:       0,
-				info:           "NO REQUEST - Response",
-			},
+			want: "NULL,NULL,::1,58108,::1,8000,0,0,NO REQUEST - Response\n",
 		},
 	}
 
 	for i, test := range tests {
 		elm := &eventLogManager{events: test.initialevents}
-		if ret := elm.InsertResponse(test.timestamp, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest, test.grpcstatuscode); !isEventEqualValue(ret, test.want) {
-			t.Errorf("InsertResponse (testcase %d): printed incorrect event", i)
-		} else if !isEventsEqual(elm.events, test.finalevents) {
+		if ret := elm.InsertResponse(test.timestamp, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest, test.grpcstatuscode); ret != test.want {
+			t.Errorf("InsertResponse (testcase %d): prints incorrect event", i)
+		}
+		if !isEventsEqual(elm.events, test.finalevents) {
 			t.Errorf("InsertResponse (testcase %d): doesn't remove event as expected", i)
 		}
 	}

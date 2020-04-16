@@ -231,6 +231,47 @@ func Test_removeEvent(t *testing.T) {
 	}
 }
 
+func Test_logString(t *testing.T) {
+	tests := []struct {
+		input EventLog
+		want  string
+	}{
+		{
+			input: EventLog{
+				servicename: "helloworld.Greeter",
+				methodname:  "SayHello",
+				ipsource:    "::1",
+				tcpsource:   58108,
+				ipdest:      "::1",
+				tcpdest:     8000,
+				duration:    0,
+				info:        "Request",
+			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,0,Request\n",
+		},
+		{
+			input: EventLog{
+				servicename:    "helloworld.Greeter",
+				methodname:     "SayHello",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       50 * time.Millisecond,
+				info:           "Request - Response",
+			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
+		},
+	}
+
+	for i, test := range tests {
+		if ret := logString(test.input); ret != test.want {
+			t.Errorf("logString (testcase %d): returns incorrect string", i)
+		}
+	}
+}
+
 func TestCreateEvent(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {

@@ -80,7 +80,6 @@ func main() {
 	for packet := range interceptor.Packets() {
 		headers := http2.Headers(packet.HTTP2)
 		// Check whether this request is response or not
-		// if requestheaders, err := requestFrame(packet.HTTP2); err == nil {
 		if err := validateRequestFrameHeaders(headers); err == nil {
 			http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
 			headers = http2.State.Headers(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
@@ -89,7 +88,6 @@ func main() {
 				continue
 			}
 			elm.CreateEvent(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
-			// } else if responseheaders, err := responseFrame(packet.HTTP2); err == nil {
 		} else if err := validateResponseFrameHeaders(headers); err == nil {
 			http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
 			headers = http2.State.Headers(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))

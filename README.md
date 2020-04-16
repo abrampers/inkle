@@ -19,12 +19,12 @@ datetime.Datetime,GetDatetime,::1,53413,::1,9000,0,10120,Request - Response
 ```sh
 $ go get -u github.com/abrampers/inkle
 $ cd $GOPATH/src/github.com/abrampers/inkle
-$ go install
+$ go build -o .
 ```
 
 ## Usage
 ```sh
-$ inkle -stdout
+$ ./inkle -stdout
 
 # Available flags
 # -stdout         (bool)      : Write logs to stdout.

@@ -78,6 +78,61 @@ func Test_validateResponseFrameHeaders(t *testing.T) {
 	}
 }
 
+func Test_outputFile(t *testing.T) {
+	file, err := ioutil.TempFile("", "inkle.log")
+	if err != nil {
+		t.Error("outputFile: failed to create temporary file")
+	}
+
+	defer file.Close()
+	defer os.Remove("inkle.log")
+
+	tests := []struct {
+		isstdout bool
+		filename string
+		want     *os.File
+		err      error
+	}{
+		{
+			isstdout: true,
+			want:     os.Stdout,
+			err:      nil,
+		},
+		{
+			isstdout: true,
+			filename: "asdf/asdf",
+			want:     os.Stdout,
+			err:      nil,
+		},
+		{
+			isstdout: false,
+			filename: file.Name(),
+			want:     file,
+			err:      nil,
+		},
+		{
+			isstdout: false,
+			filename: "asdf/asdf",
+			want:     nil,
+			err:      fmt.Errorf("open asdf/asdf: no such file or directory"),
+		},
+	}
+
+	for i, test := range tests {
+		f, err := outputFile(test.isstdout, test.filename)
+		if err == nil && test.err == nil {
+			continue
+		} else if (err == nil && test.err != nil) || (err != nil && test.err == nil) || (err.Error() != test.err.Error()) {
+			t.Errorf("outputFile (testcase %d): returns incorrect error", i)
+			t.Log(err)
+			t.Log(test.err)
+		} else if f != test.want {
+			t.Errorf("outputFile (testcase %d): returns incorrect file", i)
+		}
+		f.Close()
+	}
+}
+
 func Test_handlePacket(t *testing.T) {
 	tests := []struct {
 		bytes []byte
@@ -212,7 +267,7 @@ func Test_handlePacket(t *testing.T) {
 		packet := http2.InterceptedPacket{SrcIP: net.IPv6loopback, DstIP: net.IPv6loopback, SrcTCP: 58108, DstTCP: 8000, HTTP2: h2}
 		f, err := ioutil.TempFile("", "Test_printEvent*.log")
 		if err != nil {
-			t.Errorf("printEvent (testcase %d): %v", i, err)
+			t.Errorf("handlePacket (testcase %d): %v", i, err)
 		}
 		defer f.Close()
 		defer os.Remove(f.Name())

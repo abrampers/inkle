@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/abrampers/inkle/http2"
@@ -78,23 +80,29 @@ func handlePacket(elm logging.EventLogManager, packet http2.InterceptedPacket) s
 	return ""
 }
 
-func main() {
-	flag.Parse()
-
-	interceptor := http2.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
-	defer interceptor.Close()
-
+func outputFile(isstdout bool, filepath string) (*os.File, error) {
 	var f *os.File
-	if !*isstdout {
-		fulldir := fmt.Sprintf("%s/%s", *outputdir, filename)
-		f, err = os.OpenFile(fulldir, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if !isstdout {
+		f, err = os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	} else {
 		f = os.Stdout
 	}
+	return f, nil
+}
 
+func main() {
+	flag.Parse()
+	interceptor := http2.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
+	defer interceptor.Close()
+	filepath := filepath.Join(*outputdir, filename)
+	f, err := outputFile(*isstdout, filepath)
+	if err != nil {
+		log.Println("Failed to create output file")
+		panic(err)
+	}
 	elm := logging.NewEventLogManager(*timeout, f)
 	defer elm.Stop()
 

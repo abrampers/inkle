@@ -19,8 +19,9 @@ var (
 	outputdir      = flag.String("output", ".", "Output directory of the logs. Ignored if -stdout flag set.")
 	timeout        = flag.Duration("timeout", 800*time.Millisecond, "Request timeout in nanosecond")
 	device         = flag.String("device", "eth0", "Network interface to be intercepted.")
-	islocalrequest = flag.Bool("filter-by-host-cidr", false, "Filter logs by request originated from the host")
-	err            error
+	islocalrequest = flag.Bool("filter-by-host-cidr", false, `If this flag is set, Inkle will get the valid IP range of the network device specified in
+-device and will only print logs with source IP addres within that range.`)
+	err error
 )
 
 const (

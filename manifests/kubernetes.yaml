@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: inkle
+  namespace: kube-system
+  labels:
+    k8s-app: inkle-grpc
+spec:
+  selector:
+    matchLabels:
+      name: inkle
+  template:
+    metadata:
+      labels:
+        name: inkle
+    spec:
+      hostNetwork: true
+      containers:
+      - name: inkle
+        image: abrampers/inkle
+        args: ["-stdout", "-device=cni0", "-filter-by-host-cidr"]
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        volumeMounts:
+        - name: varlog
+          mountPath: /var/log
+        resources: # TODO: find correct numbers. Subject to change
+          limits:
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 200Mi
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: varlog
+        hostPath:
+          path: /var/log

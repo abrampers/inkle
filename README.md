@@ -27,10 +27,11 @@ $ go build -o .
 $ ./inkle -stdout
 
 # Available flags
-# -device         (string)    : Network device to be intercepted.
-# -stdout         (bool)      : Write logs to stdout.
-# -output=.       (string)    : Write log file to specified directory (ignored if -stdout is set).
-# -timeout=200ms  (duration)  : Set request timeout.
+# -device            (string) : Network device to be intercepted.
+# -stdout              (bool) : Write logs to stdout.
+# -output=.          (string) : Write log file to specified directory (ignored if -stdout is set).
+# -timeout=200ms   (duration) : Set request timeout.
+# -filter-by-host-cidr (bool) : Filter to log only outgoing request from the host.
 # -h                          : Help.
 ```
 

@@ -33,7 +33,7 @@ func NewPacketInterceptor(device string, snapshotLen int32, isPromiscuous bool, 
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Successfully opened live sniffing on %s\n", device)
+	log.Printf("Successfully opened live sniffing on %s.\n", device)
 
 	source := gopacket.NewPacketSource(handle, handle.LinkType())
 	return &PacketInterceptor{

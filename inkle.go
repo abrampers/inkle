@@ -17,11 +17,11 @@ var (
 	isstdout  = flag.Bool("stdout", false, "Write logs to stdout")
 	outputdir = flag.String("output", ".", "Output directory of the logs. Ignored if -stdout flag set.")
 	timeout   = flag.Duration("timeout", 800*time.Millisecond, "Request timeout in nanosecond")
+	device    = flag.String("device", "eth0", "Network interface to be intercepted.")
 	err       error
 )
 
 const (
-	device      string        = "lo0"
 	snaplen     int32         = 131072
 	promiscuous bool          = false
 	itcpTimeout time.Duration = 1000 * time.Millisecond
@@ -95,7 +95,7 @@ func outputFile(isstdout bool, filepath string) (*os.File, error) {
 
 func main() {
 	flag.Parse()
-	interceptor := http2.NewPacketInterceptor(device, snaplen, promiscuous, itcpTimeout)
+	interceptor := http2.NewPacketInterceptor(*device, snaplen, promiscuous, itcpTimeout)
 	defer interceptor.Close()
 	filepath := filepath.Join(*outputdir, filename)
 	f, err := outputFile(*isstdout, filepath)
@@ -105,6 +105,8 @@ func main() {
 	}
 	elm := logging.NewEventLogManager(*timeout, f)
 	defer elm.Stop()
+
+	log.Printf("Printing logs to %s.\n", f.Name())
 
 	go elm.CleanupExpiredRequests()
 

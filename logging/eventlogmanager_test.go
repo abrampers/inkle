@@ -482,7 +482,7 @@ func TestInsertResponse(t *testing.T) {
 			finalevents: []*EventLog{
 				&EventLog{},
 			},
-			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
+			want: "",
 		},
 		{
 			timestamp:      currtime.Add(50 * time.Millisecond),
@@ -531,7 +531,7 @@ func TestInsertResponse(t *testing.T) {
 					info:        "Request",
 				},
 			},
-			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
+			want: "",
 		},
 		{
 			timestamp:      currtime,
@@ -551,7 +551,7 @@ func TestInsertResponse(t *testing.T) {
 				&EventLog{},
 				&EventLog{},
 			},
-			want: "NULL,NULL,::1,58108,::1,8000,0,0,NO REQUEST - Response\n",
+			want: "",
 		},
 	}
 

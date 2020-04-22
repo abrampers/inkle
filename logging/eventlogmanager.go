@@ -54,8 +54,7 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 	}
 
 	event.insertResponse(timestamp, grpcstatuscode, " - Response")
-	m.printEvent(*event) // Consider spawn goroutine
-	return logString(*event)
+	return m.printEvent(*event) // Consider spawn goroutine
 }
 
 func (m *eventLogManager) getEvent(ipdest string, tcpdest uint16) (event *EventLog, idx int) {
@@ -146,10 +145,12 @@ func logString(e EventLog) string {
 	return fmt.Sprintf("%s,%s,%s,%d,%s,%d,%s,%d,%s\n", e.servicename, e.methodname, e.ipsource, e.tcpsource, e.ipdest, e.tcpdest, grpcstatuscode, e.duration, e.info)
 }
 
-func (m *eventLogManager) printEvent(e EventLog) {
+func (m *eventLogManager) printEvent(e EventLog) string {
 	if m.cidr.Contains(net.ParseIP(e.ipsource)) {
 		m.file.WriteString(logString(e))
+		return logString(e)
 	}
+	return ""
 }
 
 func (m *eventLogManager) printEvents(events []*EventLog) {

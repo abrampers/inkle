@@ -40,5 +40,6 @@ $ ./inkle -stdout
 - [ ] Repo architecture.
 - [x] HTTP/2 frame classification.
 - [x] State management to support gRPC connection reuse.
+- [x] Supports source IP address filtering by host CIDR.
 - [ ] Ensure correctness while ignoring unsupported streams.
 - [ ] Support for gRPC streams.

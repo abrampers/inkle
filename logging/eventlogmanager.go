@@ -2,6 +2,8 @@ package logging
 
 import (
 	"fmt"
+	"log"
+	"net"
 	"os"
 	"sync"
 	"time"
@@ -22,10 +24,12 @@ type eventLogManager struct {
 	timeout time.Duration
 	mutex   sync.RWMutex
 	file    *os.File
+	cidr    *net.IPNet
 }
 
-func NewEventLogManager(t time.Duration, f *os.File) EventLogManager {
-	return &eventLogManager{timeout: t, tticker: time.NewTicker(t), file: f}
+func NewEventLogManager(t time.Duration, f *os.File, cidr *net.IPNet) EventLogManager {
+	log.Printf("Printing logs to %s.\n", f.Name())
+	return &eventLogManager{timeout: t, tticker: time.NewTicker(t), file: f, cidr: cidr}
 }
 
 // TODO: Print all remaining events as timeout
@@ -143,7 +147,9 @@ func logString(e EventLog) string {
 }
 
 func (m *eventLogManager) printEvent(e EventLog) {
-	m.file.WriteString(logString(e))
+	if m.cidr.Contains(net.ParseIP(e.ipsource)) {
+		m.file.WriteString(logString(e))
+	}
 }
 
 func (m *eventLogManager) printEvents(events []*EventLog) {

@@ -3,6 +3,7 @@ package logging
 import (
 	"github.com/google/uuid"
 	"io/ioutil"
+	"net"
 	"os"
 	"testing"
 	"time"
@@ -354,6 +355,7 @@ func TestInsertResponse(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		timestamp                        time.Time
+		cidr                             *net.IPNet
 		ipsource, ipdest, grpcstatuscode string
 		tcpsource, tcpdest               uint16
 		initialevents, finalevents       []*EventLog
@@ -361,6 +363,7 @@ func TestInsertResponse(t *testing.T) {
 	}{
 		{
 			timestamp:      currtime.Add(50 * time.Millisecond),
+			cidr:           &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
 			ipsource:       "::1",
 			tcpsource:      8000,
 			ipdest:         "::1",
@@ -387,6 +390,7 @@ func TestInsertResponse(t *testing.T) {
 		},
 		{
 			timestamp:      currtime.Add(50 * time.Millisecond),
+			cidr:           &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
 			ipsource:       "::1",
 			tcpsource:      8000,
 			ipdest:         "::1",
@@ -435,6 +439,103 @@ func TestInsertResponse(t *testing.T) {
 		},
 		{
 			timestamp:      currtime,
+			cidr:           &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
+			ipsource:       "::1",
+			tcpsource:      8000,
+			ipdest:         "::1",
+			tcpdest:        58108,
+			grpcstatuscode: "0",
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{},
+				&EventLog{},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{},
+				&EventLog{},
+			},
+			want: "NULL,NULL,::1,58108,::1,8000,0,0,NO REQUEST - Response\n",
+		},
+		{
+			timestamp:      currtime.Add(50 * time.Millisecond),
+			cidr:           &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(128, 128)},
+			ipsource:       "::1",
+			tcpsource:      8000,
+			ipdest:         "::1",
+			tcpdest:        58108,
+			grpcstatuscode: "0",
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
+		},
+		{
+			timestamp:      currtime.Add(50 * time.Millisecond),
+			cidr:           &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(128, 128)},
+			ipsource:       "::1",
+			tcpsource:      8000,
+			ipdest:         "::1",
+			tcpdest:        58108,
+			grpcstatuscode: "0",
+			initialevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+				&EventLog{
+					id:          uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{
+				&EventLog{},
+				&EventLog{
+					id:          uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12"),
+					tstart:      currtime,
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,50000000,Request - Response\n",
+		},
+		{
+			timestamp:      currtime,
+			cidr:           &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(128, 128)},
 			ipsource:       "::1",
 			tcpsource:      8000,
 			ipdest:         "::1",
@@ -455,7 +556,7 @@ func TestInsertResponse(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		elm := &eventLogManager{events: test.initialevents}
+		elm := &eventLogManager{events: test.initialevents, cidr: test.cidr}
 		if ret := elm.InsertResponse(test.timestamp, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest, test.grpcstatuscode); ret != test.want {
 			t.Errorf("InsertResponse (testcase %d): prints incorrect event", i)
 		}
@@ -814,6 +915,7 @@ func Test_printEvent(t *testing.T) {
 	etimestamp := stimestamp.Add(duration)
 	tests := []struct {
 		input EventLog
+		cidr  *net.IPNet
 		want  string
 	}{
 		{
@@ -830,7 +932,25 @@ func Test_printEvent(t *testing.T) {
 				duration:       duration,
 				info:           "Request - TIMEOUT",
 			},
+			cidr: &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
 			want: "helloworld.Greeter,SayHello,::1,58108,::1,8000,0,2000000,Request - TIMEOUT\n",
+		},
+		{
+			input: EventLog{
+				tstart:         stimestamp,
+				tfinish:        etimestamp,
+				servicename:    "helloworld.Greeter",
+				methodname:     "SayHello",
+				ipsource:       "::1",
+				tcpsource:      58108,
+				ipdest:         "::1",
+				tcpdest:        8000,
+				grpcstatuscode: "0",
+				duration:       duration,
+				info:           "Request - TIMEOUT",
+			},
+			cidr: &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(128, 128)},
+			want: "",
 		},
 	}
 
@@ -841,7 +961,7 @@ func Test_printEvent(t *testing.T) {
 		}
 		defer f.Close()
 		defer os.Remove(f.Name())
-		elm := &eventLogManager{file: f}
+		elm := &eventLogManager{file: f, cidr: test.cidr}
 		elm.printEvent(test.input)
 
 		buf, err := ioutil.ReadFile(f.Name())
@@ -858,6 +978,7 @@ func Test_cleanup(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		time                       time.Time
+		cidr                       *net.IPNet
 		timeout                    time.Duration
 		initialevents, finalevents []*EventLog
 		want                       string
@@ -871,6 +992,7 @@ func Test_cleanup(t *testing.T) {
 		},
 		{
 			timeout: 20 * time.Millisecond,
+			cidr:    &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
 			time:    currtime,
 			initialevents: []*EventLog{
 				&EventLog{
@@ -890,6 +1012,7 @@ func Test_cleanup(t *testing.T) {
 		},
 		{
 			timeout: 20 * time.Millisecond,
+			cidr:    &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
 			time:    currtime,
 			initialevents: []*EventLog{
 				&EventLog{
@@ -918,6 +1041,57 @@ func Test_cleanup(t *testing.T) {
 			finalevents: []*EventLog{},
 			want:        "helloworld.Greeter,SayHello,::1,58108,::1,8000,-1,25000000,Request - TIMEOUT\ndatetime.Datetime,GetDatetime,::1,58110,::1,9000,-1,25000000,Request - TIMEOUT\n",
 		},
+		{
+			timeout: 20 * time.Millisecond,
+			cidr:    &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(128, 128)},
+			time:    currtime,
+			initialevents: []*EventLog{
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime.Add(-25 * time.Millisecond),
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{},
+			want:        "",
+		},
+		{
+			timeout: 20 * time.Millisecond,
+			cidr:    &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(128, 128)},
+			time:    currtime,
+			initialevents: []*EventLog{
+				&EventLog{
+					id:          uuid.MustParse("d96763c9-a9a4-49d0-9008-b63befa85b6d"),
+					tstart:      currtime.Add(-25 * time.Millisecond),
+					servicename: "helloworld.Greeter",
+					methodname:  "SayHello",
+					ipsource:    "::1",
+					tcpsource:   58108,
+					ipdest:      "::1",
+					tcpdest:     8000,
+					info:        "Request",
+				},
+				&EventLog{
+					id:          uuid.MustParse("14a9bb09-23c9-49ad-994c-de1a7f503e12"),
+					tstart:      currtime.Add(-25 * time.Millisecond),
+					servicename: "datetime.Datetime",
+					methodname:  "GetDatetime",
+					ipsource:    "::1",
+					tcpsource:   58110,
+					ipdest:      "::1",
+					tcpdest:     9000,
+					info:        "Request",
+				},
+			},
+			finalevents: []*EventLog{},
+			want:        "",
+		},
 	}
 
 	for i, test := range tests {
@@ -927,7 +1101,7 @@ func Test_cleanup(t *testing.T) {
 		}
 		defer f.Close()
 		defer os.Remove(f.Name())
-		elm := &eventLogManager{file: f, events: test.initialevents}
+		elm := &eventLogManager{file: f, events: test.initialevents, cidr: test.cidr}
 		elm.cleanup(test.time)
 
 		buf, err := ioutil.ReadFile(f.Name())

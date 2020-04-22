@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"path/filepath"
 	"time"
@@ -14,11 +15,12 @@ import (
 )
 
 var (
-	isstdout  = flag.Bool("stdout", false, "Write logs to stdout")
-	outputdir = flag.String("output", ".", "Output directory of the logs. Ignored if -stdout flag set.")
-	timeout   = flag.Duration("timeout", 800*time.Millisecond, "Request timeout in nanosecond")
-	device    = flag.String("device", "eth0", "Network interface to be intercepted.")
-	err       error
+	isstdout       = flag.Bool("stdout", false, "Write logs to stdout")
+	outputdir      = flag.String("output", ".", "Output directory of the logs. Ignored if -stdout flag set.")
+	timeout        = flag.Duration("timeout", 800*time.Millisecond, "Request timeout in nanosecond")
+	device         = flag.String("device", "eth0", "Network interface to be intercepted.")
+	islocalrequest = flag.Bool("filter-by-host-cidr", false, "Filter logs by request originated from the host")
+	err            error
 )
 
 const (
@@ -103,10 +105,13 @@ func main() {
 		log.Println("Failed to create output file")
 		panic(err)
 	}
-	elm := logging.NewEventLogManager(*timeout, f)
-	defer elm.Stop()
 
-	log.Printf("Printing logs to %s.\n", f.Name())
+	cidr := &net.IPNet{}
+	if *islocalrequest {
+		cidr = utils.CIDR(*device)
+	}
+	elm := logging.NewEventLogManager(*timeout, f, cidr)
+	defer elm.Stop()
 
 	go elm.CleanupExpiredRequests()
 

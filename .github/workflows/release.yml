@@ -1,5 +1,7 @@
-on: release
-name: Release
+on: 
+  release:
+    types: [published]
+name: release
 jobs:
   push-docker:
     name: Build and push to docker registry

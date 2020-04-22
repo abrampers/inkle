@@ -25,15 +25,16 @@ $ go build -o .
 ## Usage
 ```sh
 $ ./inkle -stdout
-
-# Available flags
-# -device            (string) : Network device to be intercepted.
-# -stdout              (bool) : Write logs to stdout.
-# -output=.          (string) : Write log file to specified directory (ignored if -stdout is set).
-# -timeout=200ms   (duration) : Set request timeout.
-# -filter-by-host-cidr (bool) : Filter to log only outgoing request from the host.
-# -h                          : Help.
 ```
+Available flags:
+| Flag | Type | Default | Description |
+| --- | --- | --- | --- |
+| `-device=cni0` | string | `eth0` | Network Device to be intercepted. |
+| `-stdout` | bool | `false` | Write logs to stdout. |
+| `-output=/var/log` | string | `.` | Write log file to specified directory (ignored if `-stdout` is set). |
+| `-timeout=200ms` | time.Duration | `800ms` | Set request timeout. |
+| `-filter-by-host-cidr` | bool | `false` | If this flag is set, Inkle will get the valid IP range of the network device specified in `-device` and will only print logs with source IP addres within that range. |
+| `-h` | n/a | n/a | Print out help message. |
 
 ## Roadmap
 - [ ] Repo description.

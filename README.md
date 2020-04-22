@@ -1,7 +1,9 @@
 # Inkle
 
 ![master](https://github.com/abrampers/inkle/workflows/master/badge.svg?event=push)
-[![coverage](https://codecov.io/gh/abrampers/inkle/branch/master/graph/badge.svg)](https://codecov.io/gh/abrampers/inkle)
+![Codecov](https://img.shields.io/codecov/c/github/abrampers/inkle)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/abrampers/inkle)
+
 
 Log Based gRPC Tracing System 𝌘
 

@@ -3,6 +3,7 @@
 ![master](https://github.com/abrampers/inkle/workflows/master/badge.svg?event=push)
 ![Codecov](https://img.shields.io/codecov/c/github/abrampers/inkle)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/abrampers/inkle)
+![Docker Image Version (latest semver)](https://img.shields.io/docker/v/abrampers/inkle?color=blue&label=docker&sort=semver)
 
 
 Log Based gRPC Tracing System 𝌘

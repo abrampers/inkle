@@ -45,6 +45,7 @@ Available flags:
 - [x] HTTP/2 frame classification.
 - [x] State management to support gRPC connection reuse.
 - [x] Supports source IP address filtering by host CIDR.
+- [ ] Log rotation.
 - [ ] HTTPS support
 - [ ] Ensure correctness while ignoring unsupported streams.
 - [ ] Support for gRPC streams.

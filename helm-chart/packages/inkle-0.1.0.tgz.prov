@@ -1,0 +1,52 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+apiVersion: v2
+appVersion: v0.1.0
+dependencies:
+- - condition: elastic.enabled
+  name: elasticsearch
+  repository: https://helm.elastic.co
+  version: 7.6.2
+- - condition: elastic.enabled
+  name: logstash
+  repository: https://helm.elastic.co
+  version: 7.6.2
+- - condition: elastic.enabled
+  name: kibana
+  repository: https://helm.elastic.co
+  version: 7.6.2
+- - condition: elastic.enabled
+  name: filebeat
+  repository: https://helm.elastic.co
+  version: 7.6.2
+description: "Log Based gRPC Tracing System \U0001D318 on Kubernetes."
+home: https://github.com/abrampers/inkle
+keywords:
+- - gRPC
+- - Tracing
+- - Log
+kubeVersion: 1.16.0 - 1.18.0
+maintainers:
+- - email: abram.perdanaputra@gmail.com
+  name: Abram Situmorang
+  url: https://abram.id
+name: inkle
+sources:
+- - https://github.com/abrampers.inkle
+type: application
+version: 0.1.0
+
+...
+files:
+  inkle-0.1.0.tgz: sha256:d44639408cd879aaefdf595d21f6b09ddf352f2b50c57e3ad041a22dc32beb74
+-----BEGIN PGP SIGNATURE-----
+
+wsBcBAEBCgAQBQJeopavCRDd/Sj7oPlMvwAAVjwIAHrf/RYIyFys2tAIHyJ5qGMg
+u76AGAu/PYvbV+Z5Qg/fQPtZUqaDzPLTlZ7j1i4bTVakbJxtvT8SZb+C70MTJOHa
+bvNoJdlUP1E54sCqoZW40NNv3i0gPBlgLtz9DqLL61yMZoXQVykfTfyUNRT68Pcl
+DMAjDYbqLI89a8FHHZrlzdKYK/rlX+R7pb0EQoBeKEZMXyPRUwLcZLV8jcBPMBl5
+D6gmlv3Qr0OaiOCwX+DOCv/ntjMscYTwy+jFhCNhJOyn6uzy24o+QW9lZKO45Cq3
+LpPr24/LP1RURiqPlgy+r7n+uo960vwinsKZzTnrMW8DjHL2NLh/RdGIDjbO5K4=
+=+iA5
+-----END PGP SIGNATURE-----

@@ -2,7 +2,6 @@
 
 ![master](https://github.com/abrampers/inkle/workflows/master/badge.svg?event=push)
 [![Codecov](https://img.shields.io/codecov/c/github/abrampers/inkle)](https://codecov.io/gh/abrampers/inkle)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/abrampers/inkle?color=%2329beb0)
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/abrampers/inkle?color=blue&label=docker&sort=semver)](https://hub.docker.com/repository/docker/abrampers/inkle/tags)
 
 

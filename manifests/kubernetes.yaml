@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: inkle
-  namespace: kube-system
   labels:
     k8s-app: inkle-grpc
 spec:
@@ -19,11 +18,6 @@ spec:
       - name: inkle
         image: abrampers/inkle
         args: ["-stdout", "-device=cni0", "-filter-by-host-cidr"]
-        env:
-        - name: NODE_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
         volumeMounts:
         - name: varlog
           mountPath: /var/log

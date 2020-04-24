@@ -22,18 +22,18 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args: {{ .Values.args }}
-        {{- with .Values.env }}
-          env:
-            {{- toYaml . | nindent 12 }}
-        {{- end }}
-        {{- with .Values.volumeMounts }}
+          args:
+            - "-device={{ .Values.device }}"
+            - "-output={{ .Values.logPath }}"
+          {{- if .Values.filterByHost }}
+            - "-filter-by-host-cidr"
+          {{- end}}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
-        {{- end }}
+            - name: varlog
+              mountPath: {{ .Values.logPath }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-    {{- with .Values.volumes }}
       volumes:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+        - name: varlog
+          hostPath:
+            path: {{ .Values.logPath }}

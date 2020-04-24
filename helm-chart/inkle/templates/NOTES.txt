@@ -6,16 +6,13 @@
    \ \__\ \__\\ \__\ \__\\ \__\ \_______\ \_______\
     \|__|\|__| \|__|\|__| \|__|\|_______|\|_______|
                                                    
-Thank you for installing {{ .Chart.Name }}.
-
-Your release is named {{ .Release.Name }}.
+Thank you for installing {{ .Chart.Name }}. Your release is named {{ .Release.Name }}.
 
 To learn more about the release, try:
 
   $ helm status {{ .Release.Name }}
   $ helm get all {{ .Release.Name }}
-
-{{ if eq .Values.elastic.enabled true }}
+{{ if .Values.elastic.enabled }}
 To access Kibana, make sure all resource is running properly by:
 
   $ helm status {{ .Release.Name }}
@@ -28,7 +25,6 @@ After all resource is running properly, do:
 
 Then you can access Kibana dashboard on http://localhost:5601.
 {{ end }}
-
 To see the log files, try:
 
-  $ kubectl exec {{ .Release.Name }}-inkle-<TAB> -- cat /var/log/inkle.log
+  $ kubectl exec {{ .Release.Name }}-inkle-<TAB> -- cat {{ .Values.logPath }}/inkle.log

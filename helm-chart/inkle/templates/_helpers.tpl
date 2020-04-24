@@ -48,6 +48,7 @@ k8s-app: {{ include "inkle.name" . }}
 Selector labels
 */}}
 {{- define "inkle.selectorLabels" -}}
+release: {{ .Release.Name | quote }}
 app.kubernetes.io/name: {{ include "inkle.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}

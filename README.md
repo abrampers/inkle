@@ -3,6 +3,7 @@
 ![master](https://github.com/abrampers/inkle/workflows/master/badge.svg?event=push)
 [![Codecov](https://img.shields.io/codecov/c/github/abrampers/inkle)](https://codecov.io/gh/abrampers/inkle)
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/abrampers/inkle?color=blue&label=docker&sort=semver)](https://hub.docker.com/repository/docker/abrampers/inkle/tags)
+[![Helm Chart](https://img.shields.io/badge/helm-chart-%2306227f)](https://github.com/abrampers/inkle/tree/master/helm-chart)
 
 
 Log Based gRPC Tracing System 𝌘

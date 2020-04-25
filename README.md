@@ -16,7 +16,37 @@ helloworld.Greeter,SayHello,::1,53412,::1,8000,0,161626,Request - Response
 datetime.Datetime,GetDatetime,::1,53413,::1,9000,0,10120,Request - Response
 ```
 
-## TODO: Installation
+## Installation
+
+### Kubernetes Environment
+
+Make sure `kubectl` is properly configured to an active Kubernetes cluster.
+
+#### Using Helm
+
+This requires [Helm](https://helm.sh/docs/intro/install/) to be installed. For more information about installing Inkle using Helm, see the [Inkle Helm Chart](https://github.com/abrampers/inkle/tree/master/helm-chart).
+
+```sh
+$ helm repo add abrampers https://abram.id/helm/abrampers
+$ helm install inkle abrampers/inkle
+```
+
+#### Apply manifest manually
+
+```sh
+$ git clone https://github.com/abrampers/inkle
+$ kubectl apply -f manifests/kubernetes.yaml
+```
+
+### Local environment
+
+#### Docker
+
+```sh
+$ docker run --name inkle --network=host --privileged --rm -it abrampers/inkle:v0.1.0 [PARAMS]
+```
+
+#### Build from source
 
 ```sh
 $ go get -u github.com/abrampers/inkle
@@ -30,7 +60,7 @@ $ ./inkle -stdout
 ```
 Available flags:
 | Flag | Type | Default | Description |
-| --- | --- | --- | --- |
+| ---- | ---- | ------- | ----------- |
 | `-device=cni0` | string | `eth0` | Network Device to be intercepted. |
 | `-stdout` | bool | `false` | Write logs to stdout. |
 | `-output=/var/log` | string | `.` | Write log file to specified directory (ignored if `-stdout` is set). |

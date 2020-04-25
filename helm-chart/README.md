@@ -9,7 +9,7 @@ This helm chart is an easier way to configure and run Inkle.
 ## Requirements
 
 * [Helm](https://helm.sh/).
-* Kubernetes 1.16 - 1.8
+* Kubernetes 1.16 - 1.18
 * Minimum cluster requirements include the following to run this chart with default settings (Elastic stack enabled). All of these settings are configurable.
   * Two Kubernetes nodes with master (2 vCPU, 3GiB), worker (1 vCPU, 2GiB).
 

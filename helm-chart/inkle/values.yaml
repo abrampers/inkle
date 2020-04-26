@@ -14,6 +14,7 @@ filterByHost: true
 
 resources: # TODO: Find correct number
   limits:
+    cpu: 100m
     memory: 200Mi
   requests:
     cpu: 100m
@@ -60,7 +61,15 @@ logstash:
         port: 8080
         protocol: TCP
         targetPort: 8080
-  logstashPipeline: 
+  extraVolumes: |
+    - name: inkletemplate
+      configMap:
+        name: inkle-index-template
+  extraVolumeMounts: |
+    - name: inkletemplate
+      mountPath: /etc/logstash/templates/inkle.json
+      subPath: inkle.json
+  logstashPipeline:
     logstash.conf: |
       input {
         beats {
@@ -87,6 +96,8 @@ logstash:
         elasticsearch {
           hosts => [ "elasticsearch-master:9200" ]
           index => "inkle-%{+YYYY.MM.dd}"
+          template => "/etc/logstash/templates/inkle.json"
+          template_name => "inkle-log"
         }
       }
 

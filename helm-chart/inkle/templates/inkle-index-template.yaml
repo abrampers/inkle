@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inkle-index-template
+  labels:
+    app: {{ template "logstash.fullname" . }}
+    chart: "{{ .Chart.Name }}"
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+data:
+  inkle.json: |
+    {
+      "index_patterns": ["inkle-*"],
+      "mappings" : {
+        "properties" : {
+          "src_ip": { "type": "ip"},
+          "dst_ip": { "type": "ip"}
+        }
+      }
+    }
+

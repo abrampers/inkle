@@ -273,7 +273,7 @@ func Test_logString(t *testing.T) {
 	}
 }
 
-func TestCreateRequest(t *testing.T) {
+func TestCreatePendingRequest(t *testing.T) {
 	currtime := time.Now()
 	tests := []struct {
 		timestamp     time.Time
@@ -342,11 +342,11 @@ func TestCreateRequest(t *testing.T) {
 
 	for i, test := range tests {
 		elm := &eventLogManager{events: test.initialevents}
-		if ret := elm.CreateRequest(test.timestamp, test.servicename, test.methodname, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest); ret != test.want {
-			t.Errorf("CreateRequest (testcase %d): prints incorrect event", i)
+		if ret := elm.CreatePendingRequest(test.timestamp, test.servicename, test.methodname, test.ipsource, test.tcpsource, test.ipdest, test.tcpdest); ret != test.want {
+			t.Errorf("CreatePendingRequest (testcase %d): prints incorrect event", i)
 		}
 		if !isEventsEqual(elm.events, test.finalevents) {
-			t.Errorf("CreateRequest (testcase %d): doesn't create event as expected", i)
+			t.Errorf("CreatePendingRequest (testcase %d): doesn't create event as expected", i)
 		}
 	}
 }

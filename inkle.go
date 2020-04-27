@@ -70,7 +70,7 @@ func handlePacket(elm logging.EventLogManager, packet http2.InterceptedPacket) s
 		if err != nil {
 			return ""
 		}
-		return elm.CreateRequest(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
+		return elm.CreatePendingRequest(time.Now(), servicename, methodname, packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))
 	} else if err := validateResponseFrameHeaders(headers); err == nil {
 		http2.State.UpdateState(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP), headers)
 		headers = http2.State.Headers(packet.SrcIP.String(), uint16(packet.SrcTCP), packet.DstIP.String(), uint16(packet.DstTCP))

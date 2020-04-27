@@ -12,7 +12,7 @@ import (
 )
 
 type EventLogManager interface {
-	CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) string
+	CreateRequest(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) string
 	InsertResponse(timestamp time.Time, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16, grpcstatuscode string) string
 	CleanupExpiredRequests()
 	Stop()
@@ -37,7 +37,7 @@ func (m *eventLogManager) Stop() {
 	m.tticker.Stop()
 }
 
-func (m *eventLogManager) CreateEvent(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) string {
+func (m *eventLogManager) CreateRequest(timestamp time.Time, servicename string, methodname string, ipsource string, tcpsource uint16, ipdest string, tcpdest uint16) string {
 	e := NewEventLog(timestamp, servicename, methodname, ipsource, tcpsource, ipdest, tcpdest, "Request")
 	m.addEvent(e)
 	return logString(*e)

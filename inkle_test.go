@@ -188,7 +188,7 @@ func Test_handlePacket(t *testing.T) {
 				0x00,
 			},
 			cidr: &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
-			want: "NULL,NULL,::1,8000,::1,58108,0,0,NO REQUEST - Response\n",
+			want: "NULL,NULL,::1,8000,::1,58108,0,0,NO_REQUEST - Response\n",
 		},
 		{
 			bytes: []byte{
@@ -251,7 +251,7 @@ func Test_handlePacket(t *testing.T) {
 				0x00,
 			},
 			cidr: &net.IPNet{IP: net.ParseIP("::"), Mask: net.CIDRMask(0, 128)},
-			want: "NULL,NULL,::1,8000,::1,58108,0,0,NO REQUEST - Response\n",
+			want: "NULL,NULL,::1,8000,::1,58108,0,0,NO_REQUEST - Response\n",
 		},
 		{
 			bytes: []byte{

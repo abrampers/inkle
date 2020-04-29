@@ -48,7 +48,7 @@ func (m *eventLogManager) InsertResponse(timestamp time.Time, ipsource string, t
 	var idx int
 	event, idx = m.getEvent(ipdest, tcpdest)
 	if idx == -1 {
-		event = NewEventLog(time.Time{}, "NULL", "NULL", ipdest, tcpdest, ipsource, tcpsource, "NO REQUEST")
+		event = NewEventLog(time.Time{}, "NULL", "NULL", ipdest, tcpdest, ipsource, tcpsource, "NO_REQUEST")
 	} else {
 		m.removeEvent(event.id)
 	}

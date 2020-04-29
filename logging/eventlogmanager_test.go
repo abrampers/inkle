@@ -455,7 +455,7 @@ func TestInsertResponse(t *testing.T) {
 				&EventLog{},
 				&EventLog{},
 			},
-			want: "NULL,NULL,::1,58108,::1,8000,0,0,NO REQUEST - Response\n",
+			want: "NULL,NULL,::1,58108,::1,8000,0,0,NO_REQUEST - Response\n",
 		},
 		{
 			timestamp:      currtime.Add(50 * time.Millisecond),

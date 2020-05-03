@@ -16,7 +16,7 @@ dependencies:
   name: kibana
   repository: https://helm.elastic.co
   version: 7.6.2
-- - condition: elastic.enabled
+- - condition: elastic.filebeat
   name: filebeat
   repository: https://helm.elastic.co
   version: 7.6.2
@@ -26,7 +26,7 @@ keywords:
 - - gRPC
 - - Tracing
 - - Log
-kubeVersion: 1.16.0 - 1.18.0
+kubeVersion: 1.16.0 - 1.18.2
 maintainers:
 - - email: abram.perdanaputra@gmail.com
   name: Abram Situmorang
@@ -39,14 +39,14 @@ version: 0.1.0
 
 ...
 files:
-  inkle-0.1.0.tgz: sha256:d4cef0f5b5df612cc8626e9c0f2ce9e19c9f5fa8ded2d6c24aa9390337aaf43f
+  inkle-0.1.0.tgz: sha256:821b9f39955a2a6bc746c3cc404c424e45a1641a9999ab9bfad217b0ee17cc1b
 -----BEGIN PGP SIGNATURE-----
 
-wsBcBAEBCgAQBQJepUTNCRDd/Sj7oPlMvwAA/VMIAMWJzygph78zyP22VeRYhttM
-jX7PL9sszVAtlsZ4Ake/0TEASoCbbonZsFqtOVbhauqOO8r5vdMMd3zAlJ+JVCIL
-pPzXdhcU5hVbRSbTgMdkEbio5dAWOM8Zbw5TUMUk5Lchm/4e7K9DfIt7lGSj9fQ9
-a5GT5RQ7POMt5hg7LPnxulr1WQRKJpB6oCrlV99hsps4mIoE/CGAg5IEo1+0C1Y7
-F67FmV3sg6gEs20Q1iMzu7DzDleKSsQwdzJeg6NhlHpdgiU76RB5TnAe3ispTBWB
-kNPQkROYU5MykXsRyzVSBa8BW8hUq72Z62gADspDXRisICktd3za0NHijzcmfFY=
-=PVW0
+wsBcBAEBCgAQBQJers8iCRDd/Sj7oPlMvwAA0X8IAEMcYiMu+EQqHpyhB+IORck4
+geW6Ga84cpN5WGm//Bj6eLnSIRhEiZjfpC9ooPcDtrSCwK45cD22Ki/FS8cXvwMD
+bMX1FJRXIFUBDGa24EDmjeIpiwWPzktRV5xJ4nQpLM41kGACpCuLdH4QhN5p/5v9
+8bv93BWVo0M5prtbt92P4H3RJbEQEGZEqUU1ZEd4LmVZXCKtw252Ckw1p+JdpNIP
+aLzbFuVeHn4gRF/LlmjVOU+TMstPvuAPR8PkhWXTPDE2fBDfKjBsffjDjeKMREu9
+5GsnEDl6CefskO88ThPO6gsHpyBZzbCKBTbHUSl32lICTdL3veUZ79kozqaq1as=
+=TJIi
 -----END PGP SIGNATURE-----

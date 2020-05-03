@@ -24,6 +24,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - "-device={{ .Values.device }}"
+          {{- if .Values.timeout }}
+            - "-timeout={{ .Values.timeout }}"
+          {{- end }}
             - "-output={{ .Values.logPath }}"
           {{- if .Values.filterByHost }}
             - "-filter-by-host-cidr"

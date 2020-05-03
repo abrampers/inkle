@@ -21,10 +21,14 @@ To access Kibana, make sure all resource is running properly by:
 
 After all resource is running properly, do:
 
-  $ kubectl port-forward {{ .Release.Name }}-kibana-<TAB> 5601:5601
+  $ kubectl port-forward service/{{ .Release.Name }}-kibana 5601:5601
 
 Then you can access Kibana dashboard on http://localhost:5601.
 {{ end }}
 To see the log files, try:
 
+{{- if eq .Release.Name "inkle" }}
+  $ kubectl exec inkle-<TAB> -- cat {{ .Values.logPath }}/inkle.log
+{{- else }}
   $ kubectl exec {{ .Release.Name }}-inkle-<TAB> -- cat {{ .Values.logPath }}/inkle.log
+{{- end }}

@@ -6,6 +6,7 @@ image:
   pullPolicy: IfNotPresent
 
 elastic:
+  filebeat: true
   enabled: true
 
 device: "cni0"
@@ -19,6 +20,25 @@ resources: # TODO: Find correct number
   requests:
     cpu: 100m
     memory: 200Mi
+
+filebeat:
+  extraVolumes:
+  - name: varlog
+    hostPath: 
+      path: /var/log
+  extraVolumeMounts:
+  - name: varlog
+    mountPath: /var/log
+    readOnly: true
+  filebeatConfig:
+    filebeat.yml: |
+      filebeat.inputs:
+      - type: log
+        enabled: true
+        paths:
+          - /var/log/inkle.log
+      output.logstash:
+        hosts: ["logstash:5044"]
 
 elasticsearch:
   replicas: 1
@@ -89,7 +109,7 @@ logstash:
           }
         }
         ruby {
-          code => "event.set('duration', event.get('duration') / 1000)"
+          code => "event.set('duration', event.get('duration') / 1000000)"
         } 
       }
       output {
@@ -100,23 +120,4 @@ logstash:
           template_name => "inkle-log"
         }
       }
-
-filebeat:
-  extraVolumes:
-  - name: varlog
-    hostPath: 
-      path: /var/log
-  extraVolumeMounts:
-  - name: varlog
-    mountPath: /var/log
-    readOnly: true
-  filebeatConfig:
-    filebeat.yml: |
-      filebeat.inputs:
-      - type: log
-        enabled: true
-        paths:
-          - /var/log/inkle.log
-      output.logstash:
-        hosts: ["logstash:5044"]
 

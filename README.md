@@ -5,8 +5,11 @@
 [![Docker Image Version (latest semver)](https://img.shields.io/docker/v/abrampers/inkle?color=blue&label=docker&sort=semver)](https://hub.docker.com/repository/docker/abrampers/inkle/tags)
 [![Helm Chart](https://img.shields.io/badge/helm-chart-%2306227f)](https://github.com/abrampers/inkle/tree/master/helm-chart)
 
-
 Log Based gRPC Tracing System 𝌘
+
+This is my bachelor thesis project to obtain Computer Science bachelor degree from Institut Teknologi Bandung.
+
+This [paper](https://ieeexplore.ieee.org/abstract/document/9429054) was published on [ICAICTA 2020](http://icaicta.cs.tut.ac.jp/2020/).
 
 ## Log format
 ```
